@@ -1,0 +1,297 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>A Swarm of Xbees! Arduino Xbee Wireless &amp; More</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2011/04/xbee.jpg"/></p>
+<div class="intro">
+In the past we have covered a few things that interact through serial, from <a href="./rfid-arduino">RFID readers</a> to <a href="./arduino-serial">controlling an Arduino's pins using the serial terminal</a>. Serial as we have talked about it is actually know as UART, and operates over 2 pins RX and TX (receive and transmit). These connections have previously been limited by their required wires. So... what if you could drop the wire connection between the arduino and the RFID reader, or your computer and the arduino without adding much complexity? Well that is what Gerardo proposed with this article he wrote for bildr.
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<p>Everyone hates long wires running from one end of the room to the other, and let’s face it, it's aesthetically unpleasant. So, why not make your next project a little bit more interesting and easy to use by adding wireless communication capabilities? In this post we will be using the the series 1 XBee modules to make this happen. This particular version of the XBee is perfect for applications where you need low-power consumption, easy integration, and great distance.</p>
+<h3>Series 1 vs Series 2/.25</h3>
+<p>A quick note here: This article does not cover the <a href="http://www.sparkfun.com/search/results?term=xbee+series+2&amp;what=products">series 2 or series 2.5 XBee modules</a>, and the series 1 and 2/2.5 are not compatible with each other. If you are looking to create mesh-networks, or multi-point to single-point networks, this is not for you, and you want the series 2/2.5. If you want ease-of-use, have low security requirements, and are basically looking to replace your wired serial connection with a wireless solution, the series 1 XBee is perfect.</p>
+<p>Furthermore, the series 2/2.5 is not meant to replace the series 1... They are just different and live side by side, so don't feel like you are buying obsolete technology with the series 1.</p>
+<p>As I alluded to above, these modules are basically a wireless UART serial connection, so you can communicate with anything that uses UART (has the RX/TX pins). And when series 1 XBees are properly configured, sending data through the RX pin on modules will cause that exact same data to just come pouring out the TX pin on all other XBees in range as if they were wired together. Simple as that.</p>
+</div>
+<div class="rightColumn">
+<a href="images/2011/04/XBee-Arduino-Shield.png"><img alt="" class="noFrame" src="images/2011/04/XBee-Arduino-Shield-400x569.png" title="XBee Arduino Shield"/></a>
+</div>
+</div>
+<div class="wideBody">
+<h3>Choosing the right one for you</h3>
+<p>XBees come with different antennas, and power ratings, so depending on what your requirements are, the modules will cost you anywhere from $20 to $70 and are available from your favorite vendor like <a href="http://www.sparkfun.com/">Sparkfun</a>. If you are not sure what you need, go with the <a href="http://www.sparkfun.com/products/8664">1mW chip antenna</a> version, and you usually can't go wrong.</p>
+<p>Each module has its own advantages and disadvantages, and you should choose them considering your individual requirements. </p>
+<ul class="list">
+<li><a href="http://www.sparkfun.com/products/8665">Wire antennas</a> offer omnidirectional  (When the antenna is straight, the maximum transmission distance is equal in all directions.)</li>
+<li><a href="http://www.sparkfun.com/products/8664">The chip antenna</a> is a flat ceramic chip. It takes up less space than the wire antenna, but the signal is not as omnidirectional as the wire antenna.</li>
+<li><a href="http://www.sparkfun.com/products/8666">The U.FL connector</a> is the smallest of the external antenna connectors. You can use the XBee without attaching an antenna to this connector, but if your project is inside a metal case, you will need to attach an antenna and make sure it pops out. If you don’t, the signal will be attenuated by the metallic case.</li>
+</ul>
+<h3>getting started</h3>
+<p>At the very minimum, you are going to need at least 2 XBee modules... But we also reccomend using either an XBee shield, or XBee ready Arduino, as well as an XBee explorer if you want to change the XBee's default configuration. So, yes, it can get expensive, but you are opening a lot of new possibilities for your projects.</p>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<h3>Hooking one up</h3>
+<p>The supply voltage for the XBees is 3.3 volts, and it is a strict 3.3v. Sending a 5v serial commend to them from your Arduino can flat out kill them, so pay close attention when connecting so you don’t fry your circuits. </p>
+<p>Arduino in its many forms has made this easy for you, you can purchase an <a href="http://www.sparkfun.com/products/9976">XBee shield</a> that will take care of all of this, or they even sell XBee ready Arduinos like the <a href="http://www.sparkfun.com/products/9712">Arduino Fio</a> (requires an external usb programmer). These guys are going to do everything for you as far as getting the XBee connected to your arduino goes.</p>
+<p>If you are using an Arduino and have no XBee shield, or you want to go completely Arduino-less, you still have options. If your arduino is a <a href="http://www.sparkfun.com/products/9266">lillypad</a> or <a href="http://www.sparkfun.com/search/results?term=arduino+3.3v&amp;what=products">other 3.3v arduino</a> this will be easier, and nothing else is really needed. If you are like 95% of us and all your arduino's are 5v arduinos, this is only slightly harder. The 5v arduinos like the duemilanove and the uno all communicate at 5v. That means that even if you power something up using the 3.3v pin, the serial, digital pins, everything, are all still operating at 5v. Sometimes this is not an issue, but with the XBee it is. But there is a way to convert the 5v to 3.3v using something called a <a href="http://www.sparkfun.com/products/8745">logic level converter</a>. The logic level converter steps the 5v down to 3.3v for safe communication. It also works the other way around, the 3.3v serial from the xBee will be converted to 5v serial for the Arduino.</p>
+<p>If you decide to go this way, note, the XBee is not breadboard friendly, so you may want a <a href="http://www.sparkfun.com/products/8276">breakout board</a> unless you want to solder directly to the pins. Sparkfun does offer a board that acts as a <a href="http://www.sparkfun.com/products/9132">brekout board and logic level converter</a> in one, but, based on the comments, it sounds like a lot of people are having issues with it, so be forewarned.</p>
+<p>The logic level converter needs to be powered by both 5v and 3.3v, and has several ins/outs. So look to the schematic on the right to get this all figured out.</p>
+<p>The XBee itself really only needs 4 connections to operate. Power, ground, and RX/TX. If you have this hooked up to a sensor that is only transmitting data (Like the <a href="./rfid-arduino">RFID reader</a>), you could even get away with 3 connections. The XBee has many other pins on it like read/write LED pins so you can see when it is communicating, but these are't required.</p>
+<h3>Configuring the XBees</h3>
+<p>XBees are actually ready to use out of the box. They all come configured on channel 0X0C (12), operating on network 3332, and use a default baud rate of 9600bps. What this means is that without changing these settings, they will just talk to each other. But it also means that anyone else (in range) who also hasn't changed these setting can communicate with them as well. If this is not an issue for you, you can actually skip the rest, you are done. Just remember that someone's command to read a value, could be your command to self-destruct, so if you wonder why your robot just jumped off a cliff, it could be because someone with the same settings just came into range. So... if you would like to change these settings and make your wireless a bit more secure, keep reading.</p>
+<p>To reconfigure your XBee, you are going to need a way to connect it with your computer. For this we use the <a href="http://www.sparkfun.com/products/8687">XBee Explorer USB</a>. This requires the <a href="http://www.ftdichip.com/FTDrivers.htm">FTDI drivers</a> to work, but of your computer is already setup to wotk with a pre-UNO arduino, you actually already have this installed. To talk to the XBee you will need the <a href="http://www.digi.com/support/kbase/kbaseresultdetl.jsp?kb=125">XCTU software (windows)</a>, or a serial terminal like <a href="http://www.macupdate.com/app/mac/6888/zterm-x">ZTERM</a>. The arduino software does have a serial terminal, but it wont work for this. (it needs to be able to transmit without line end characters)</p>
+<p>To reconfigure the XBee, first plug the XBee onto the explorer making sure it is facing the right direction (use the white outline as a reference) then plugin the explorer to your computer.</p>
+</div>
+<div class="rightColumn">
+<div class="imageWithCaption">
+<a href="images/2011/04/dim_led_xbee_shied_arduino.png"><img alt="" class="noFrame" src="images/2011/04/dim_led_xbee_shied_arduino-400x361.png" title="dim_led_xbee_shied_arduino"/></a>
+<p>XBee shield on top of Arduino with LED and potentiometer for code example 2</p>
+</div>
+<div class="imageWithCaption">
+<a href="images/2011/04/3.3v_arduino_xbee.png"><img alt="" class="aligncenter size-medium wp-image-978" height="281" src="images/2011/04/3.3v_arduino_xbee-400x281.png" title="3.3v_arduino_xbee" width="400"/></a>
+<p><a href="http://www.sparkfun.com/products/9221"><strong>3.3v</strong> Arduino Pro</a> connected directly to the XBee Module</p>
+</div>
+<div class="imageWithCaption">
+<a href="images/2011/04/5v_arduino_xbee1.png"><img alt="" class="noFrame" src="images/2011/04/5v_arduino_xbee1-400x257.png" title="5v_arduino_xbee"/></a>
+<p>5V Arduino connected to XBee using a <a href="http://www.sparkfun.com/products/8745">Logic Level Converter</a></p>
+</div>
+<div class="imageWithCaption">
+<a href="images/2011/04/xbee_RFID_Reader.png"><img alt="" class="noFrame" src="images/2011/04/xbee_RFID_Reader-400x172.png" title="xbee_RFID_Reader"/></a>
+<p><a href="./rfid-arduino">ID-20 RFID reader</a>, sending data through XBee without a microcontroller</p>
+</div>
+</div>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<h3>Windows Computer</h3>
+<p>First, <a href="http://www.digi.com/support/kbase/kbaseresultdetl.jsp?kb=125">download</a> and open the XCTU application. Check the different tabs at the top. From PC Settings, you will have to choose the correct COM port. After selecting it, you should see basic information on your current configuration (baud rate, flow control, data bits, parity and stop bits). The Range Test tab allows you to check the communication range. This range depends on the materials interfering with the line of sight  (walls, furniture, etc.) and other signals in the environment, portable phones, microwaves, other XBee networks... From the Terminal tab you will be able to send data and see any received information. The Modem Configuration tab will allow you to make changes to the current configuration.</p>
+<p>For this tutorial we will be focusing on the PC Settings, Terminal, and Modem Configuration tabs, but feel free to explore the Range Test tab. After selecting the correct COM port in PC Settings and checking out the basic information, click the Test/Query button. A window should (see picture blow) pop up indicating some information about your XBee. If nothing pops up, try again, and make sure the xbee and explorer are connected correctly. If it still does not work, your XBee could be malfunctioning and may need to contact the manufacturer for support. </p>
+<div><a href="images/2011/04/windows-XCTU.jpg"><img alt="" class="noFrame" src="images/2011/04/windows-XCTU-400x260.jpg" title="windows XCTU" width="500px"/></a></div>
+<p>Now open the Modem Configuration tab, and click on the Read button to check the current configuration. </p>
+<p>At this point you may be required to download some updates. If this is the case, click on the "Download new versions" button. Use the web as the source, and wait for the download. After the updates are installed, press the Read button. </p>
+<p>The white box should start populating with the actual configurations. In order to change them, double click on the value and entered in the desired value. If you want, you can up the baud rate in order to speed up transmission.</p>
+<p>Make sure to note the channel your XBee is working on. Once finished with the first xbee, do the same to the second making sure the channel, network id, and baud rate are the same. All of your XBees will need to be have the same channel and the same settings under “Serial Interfacing” to be able to communicate with each other. Different channels are available in case there are other XBees projects nearby as even operating on different network IDs, nearby XBees on the same channel can cause interference and reduce the achievable distance. </p>
+<p>You should now have both XBees with the same configuration. Leave one xbee on the explorer and mount the shield on top of the Arduino, but do not place the xbee on the shield (or connect it to your arduino) just yet.</p>
+</div>
+<div class="rightColumn">
+<h3>Non-Windows computer</h3>
+<p>Unfortunately the XCTU application is windows only, but if you are on a mac, or linux, you are not at a complete loss. Using your favorite terminal application you can do most of the configuration via the command line. For this demo, I we will be using <a href="http://www.macupdate.com/app/mac/6888/zterm-x">ZTerm</a> for Mac OSX.</p>
+<p>After you have the XBee connected to the explorer, and the explorer connected to to your computer, go ahead and open ZTerm. A window may pop up asking what you what serial port you would like to connect to, select the one with the funny name, it should start with "usbserial" - Mine was usbserial-A8007ZVm. If it does not come up, after zterm has finished launching, go to the settings menu and select "Modem Preferences". Under "Serial Port" select the one as described above (image below). Now go back to the settings menu and select "Connection..." Here we need to change a few things. Make sure to configure this just as I have mine in the image below, especially making sure that the baud rate is set 9600. The terminal should be all ready to communicate with the XBee.</p>
+<p><a href="images/2011/04/zterm-modem-settings.png"><img alt="" class="noFrame" src="images/2011/04/zterm-modem-settings-400x131.png" title="zterm modem settings" width="500"/></a></p>
+<p>Now that that is all done, we are going to send commands to the XBee to set configurations. This will feel a little weird at first, but you will be ok. <strong>When you type, you will not see it in the terminal window. This is normal!</strong> Some of the commands you do not press enter after, so remember that! Also, if you dont enter commands after a few seconds, you have to nudge it again by entering the attention command again.</p>
+<p>You can change a lot of the setting from here, but im only going to cover changing the network ID. For more information on changing other settings through the terminal <a href="http://www.libelium.com/squidbee/index.php?title=How_to_set_XBee_parameters">check out this page</a>. </p>
+<p>In the terminal window we are going to call the attention of the XBee by typing +++ <strong>DO NOT PRESS ENTER</strong> - but you should see "OK" appear once you do it. If you wait too long before you type another command, the XBee will stop responding to your requests. If this happens, just type +++ again.</p>
+<p>First, just to make sure it is all working, type ATID and hit enter (Henceforth noted as <enter>). It should read back 3332, this is your network ID - 3332 is that default we talked about. To change this, type ATID and the 4 digit ID you would like to use and hit enter. Like ATID1234<enter> or ATID2600<enter>, and it should read back OK. If it looks like it says OK32, it is because zterm does not clear the line, so the 32 is left over. Type ATID<enter> again and it should read back the network ID you set using ATID. Now that we set the Network ID, we need to save it. To save the new settings type ATWR<enter>.</enter></enter></enter></enter></enter></p>
+<p>Now that the settings are saved, you need to apply these same settings all XBee modules you want on the same network, or they wont be able to communicate with each other.
+</p></div>
+</div>
+<h3>Post Configuration</h3>
+<p>Now that all of your XBee modules are all set up and on the same network the way this will work is that any incoming data on that RX pin on any XBees on the network will cause that same data to come out of the TX pin of all the other modules on the network and vice versa. So... If you have 10 XBees on that network, they will all receive any data that any of them transmit. This is pretty cool I know! Just note that the serial buffer can get filled pretty quickly so if you are transmitting too much data constantly, you can get lost packets and some of the data may not transmit properly.</p>
+<p>Also, if you have an XBee on an xbee explorer connected to your computer, and you have your arduino serial monitor open (you will need to select the explorer just as you would an arduino to be able to read from it), you can send and receive commands to the xbees on that network using this. This also means that the wireless RFID diagram above could send that RFID tag to an XBee connected to an Arduino, or a computer.</p>
+<p>So we have a few code examples that show both of these happening.</p>
+<h3>Code</h3>
+<p>Because the Arduino is actually programmed through the same RX/TX pins the xbee will be using, it is not possible to program your Arduino while the XBee is connected to it. <strong>So you need to make sure to remove the XBee from the Arduino when you go to upload a new sketch.</strong></p>
+<p>For our first code example, we have put together an extremely simple computer to Arduino sketch where we are going to send data from the computer to the Arduino and vice versa. Sending "a" from the computer terminal window will turn on the LED on pin 13 of the Arduino, and sending "b" will turn it off. </p>
+<p>You can also send this data from XCTU as well in the Terminal tab. Type an ‘a’. Check your Arduino's LED under the shield. It should be on. Type ‘b’ to turn it off. You can also send data from the Arduino to the computer just as you normally would using Serial.print(). This can be really helpful in getting a response back after you send a command.</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="co1">//////////////////////////////////////////////////////////////////</span>
+<span class="co1">//©2011 bildr</span>
+<span class="co1">//Released under the MIT License - Please reuse change and share</span>
+<span class="co1">//Monitors the serial port to see if there is data available.</span>
+<span class="co1">//'a' turns on the LED on pin 13. 'b' turns it off.</span>
+<span class="co1">//////////////////////////////////////////////////////////////////</span>
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span>
+  <span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span>    	<span class="co1">//initialize serial</span>
+  <span class="kw3">pinMode</span><span class="br0">(</span>13<span class="sy0">,</span> <span class="kw2">OUTPUT</span><span class="br0">)</span><span class="sy0">;</span>   	<span class="co1">//set pin 13 as output</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span>
+  <span class="kw1">while</span><span class="br0">(</span><span class="kw3">Serial</span>.<span class="me1">available</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="br0">{</span>  <span class="co1">//is there anything to read?</span>
+	<span class="kw4">char</span> getData <span class="sy0">=</span> <span class="kw3">Serial</span>.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>  <span class="co1">//if yes, read it</span>
+
+	<span class="kw1">if</span><span class="br0">(</span>getData <span class="sy0">==</span> <span class="st0">'a'</span><span class="br0">)</span><span class="br0">{</span>  	 
+  	  <span class="kw3">digitalWrite</span><span class="br0">(</span>13<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="br0">}</span><span class="kw1">else</span> <span class="kw1">if</span><span class="br0">(</span>getData <span class="sy0">==</span> <span class="st0">'b'</span><span class="br0">)</span><span class="br0">{</span>
+  	  <span class="kw3">digitalWrite</span><span class="br0">(</span>13<span class="sy0">,</span> <span class="kw2">LOW</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="br0">}</span>
+  <span class="br0">}</span>
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<hr/>
+<p>The second example requires 2 or more Arduino/XBee combos that are exactly the same. See the diagram above with the potentiometer and LED connected to it.</p>
+<p>What this does: Turning the potentiometer on one Arduino, will change the brightness of all the others on the network.</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="co1">//////////////////////////////////////////////////////////////////</span>
+<span class="co1">//©2011 bildr</span>
+<span class="co1">//Released under the MIT License - Please reuse change and share</span>
+<span class="co1">//Turning the pot on one Arduino, dims the LED on all the others on the network</span>
+<span class="co1">//////////////////////////////////////////////////////////////////</span>
+
+<span class="co2">#define potPin 3</span>
+<span class="co2">#define ledPin 11</span>
+
+
+<span class="kw4">int</span> inByte <span class="sy0">=</span> <span class="sy0">-</span><span class="nu0">1</span><span class="sy0">;</span>
+<span class="kw4">char</span> inString<span class="br0">[</span>6<span class="br0">]</span><span class="sy0">;</span>
+<span class="kw4">int</span> stringPos <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> 
+<span class="kw4">int</span> lastValue <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span>  <span class="br0">{</span> 
+  <span class="kw3">pinMode</span><span class="br0">(</span>ledPin<span class="sy0">,</span> <span class="kw2">OUTPUT</span><span class="br0">)</span><span class="sy0">;</span> 
+  <span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span> 
+<span class="br0">}</span> 
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span> 
+   inByte <span class="sy0">=</span> <span class="kw3">Serial</span>.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+   <span class="co1">//only send new value if it is different than last sent value.</span>
+   <span class="co1">//Min value change of 5 neded. Just so we dont flood the network</span>
+   <span class="kw4">int</span> potVal <span class="sy0">=</span> <span class="kw3">analogRead</span><span class="br0">(</span>potPin<span class="br0">)</span><span class="sy0">;</span>
+   <span class="kw1">if</span><span class="br0">(</span> <span class="kw3">abs</span><span class="br0">(</span>potVal <span class="sy0">-</span> lastValue<span class="br0">)</span> <span class="sy0">&gt;</span> 5<span class="br0">)</span><span class="br0">{</span>
+     <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span>potVal<span class="br0">)</span><span class="sy0">;</span>  
+     lastValue <span class="sy0">=</span> potVal<span class="sy0">;</span>
+   <span class="br0">}</span>
+
+  <span class="co1">//if there is any numerical serial available, store that</span>
+  <span class="kw1">if</span><span class="br0">(</span><span class="br0">(</span>inByte <span class="sy0">&gt;=</span> <span class="st0">'0'</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="br0">(</span>inByte <span class="sy0">&lt;=</span> <span class="st0">'9'</span><span class="br0">)</span><span class="br0">)</span><span class="br0">{</span>
+    inString<span class="br0">[</span>stringPos<span class="br0">]</span> <span class="sy0">=</span> inByte<span class="sy0">;</span>
+    stringPos <span class="sy0">++;</span>
+  <span class="br0">}</span>
+
+  <span class="co1">//if there is a line end character, this string is done, take value and write to LED pin</span>
+  <span class="co1">//clear the string when done</span>
+  <span class="kw1">if</span><span class="br0">(</span>inByte <span class="sy0">==</span> <span class="st0">'<span class="es1">\r</span>'</span><span class="br0">)</span><span class="br0">{</span>
+    <span class="kw4">int</span> brightness <span class="sy0">=</span> atoi<span class="br0">(</span>inString<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//convert string to int</span>
+
+    <span class="co1">//incoming will be a range of 0-1023, we need 0-255</span>
+    brightness <span class="sy0">=</span> <span class="kw3">map</span><span class="br0">(</span>brightness<span class="sy0">,</span> 0<span class="sy0">,</span> 1023<span class="sy0">,</span> 0<span class="sy0">,</span> 255<span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw3">analogWrite</span><span class="br0">(</span>ledPin<span class="sy0">,</span> brightness<span class="br0">)</span><span class="sy0">;</span>
+
+
+    <span class="co1">//clear the values from inString</span>
+    <span class="kw1">for</span> <span class="br0">(</span><span class="kw4">int</span> c <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> c <span class="sy0">&lt;</span> stringPos<span class="sy0">;</span> c<span class="sy0">++</span><span class="br0">)</span><span class="br0">{</span>
+      inString<span class="br0">[</span>c<span class="br0">]</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+    stringPos <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+  <span class="br0">}</span>
+
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<h3>Extending This</h3>
+<p>Now that you have the basis on XBees, try working with more than two XBees. Create different network topologies and try different configurations. Explore how walls and other objects affect the range of the signal transmission. If you really cant think of something right away, use two arduinos to make a wireless RFID door lock <a href="./rfid-arduino">converting this tutorial</a>. Or take control of your Arduino's pins wirelessly <a href="./arduino-serial">converting this tutorial</a>. But really, who cant think of something that could be made cooler using wireless?</p>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/arduino-xbee-wireless">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

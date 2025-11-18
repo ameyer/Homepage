@@ -1,0 +1,210 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Sensing Orientation With The ADXL335 + Arduino</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2011/04/adxl335.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+<p>I know, I know, this one has such a simple name. Where's the pun? Honestly, the description was just to long to include one. Maybe it could have been "What's Up? Sensing Orientation With The ADXL335 + Arduino" - Ehhh... Probably not.</p>
+<p>A few weeks ago we wrote a tutorial about using the <a href="./adxl345-arduino">ADXL345 to sense taps, and drops</a>, but this week we are going to wind it back, go back to basics, and show you how to take an analog 3-axis accelerometer and use it to sense simple orientation with it, specifically the ADXL335, but this can be applied to any analog 3-axis accelerometer.</p>
+<p>Before we really dive into it, we need a general understanding of how accelerometers work, so if you already know why each axis can only differentiate 180deg of movement, you can skip this. <strong>Wraning: Over-simplification ahead.</strong> In the last article I described an accelerometer as a device that sensed movement. Today, think of them as devices that sense gravity. </p>
+</div>
+<div class="rightColumn">
+<a href="images/2011/04/adxl335.png"><img alt="" class="aligncenter size-medium wp-image-954" height="223" src="images/2011/04/adxl335-400x223.png" title="adxl335" width="400"/></a>
+</div>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<h3>Basic Understanding Of Accelerometers</h3>
+<p>Accelerometers measure acceleration, often caused by motion. But when they are standing still, the only acceleration the accelerometer senses is due to gravity pulling down on it. </p>
+<p>Imagine a box that has little springs sticking straight out from the sides of the box, and that the accelerometer measures how hard gravity is stretching out those springs. The springs on the side are all bending the same amount, the spring on the bottom is all stretched out, and the one at the top is not stretched at all (because the spring is pull back into itself), so the accelerometer sees it as feeling no gravity, or 0g (gravity).  If you rotate the box 90º and follow the spring on the top. It is now on the side and is hanging down some and the sensor sees it now feels .5g. Rotate 90º again, and it is at the bottom, stretched out, and it feels 1g. Rotate again 90º and we are at the side again, with it feeling .5g, and 90º rotation again, we are back at the top and it feels 0g. So we made a full rotation and the accelerometer saw this: 0g-&gt; .5g -&gt; 1g -&gt; .5g -&gt; 0g. </p>
+</div>
+<div class="rightColumn">
+<p><a href="images/2011/04/acceleration.png"><img alt="" class="aligncenter size-medium wp-image-962" height="285" src="images/2011/04/acceleration-400x285.png" title="acceleration" width="400"/></a></p>
+</div>
+</div>
+<p>If you look at this, it means that the accelerometer can really only sense differences in 180º of movement as the other 180deg is just a mirror image. So how can we sense 360 deg of movement?</p>
+<p>The trick to this is that while one axis can only sense a 180deg difference, so can the another axis, but they sense it differently. If you look at the chart to the right, you can see the sensed values while rotating round the X Axis. (The x never changes because it is always facing the same direction) - So we can combine the y, and z values to find x using a trigonometry function called <a href="http://en.wikipedia.org/wiki/Atan2">Atan2</a> who then gives us values back as -180º to 180º  (but in <a href="http://en.wikipedia.org/wiki/Radian">radians</a>, so it is -π to π and well have to convent it).</p>
+<h3>No Love For Yaw</h3>
+<p>Yaw is name for rotation around an axis that is similar to spinning a top, or shaking your head "no." Accelerometers can't measure this type of motion. Why? Well think about the box. If you turn the box in this manner, non of the sides change their orientation to the ground. If you need to measure yaw, you will need to incorporate a gyro or digital compass into your project, but it gets tricky, and is beyond the scope of this article.</p>
+<h3>Why So Shaky?</h3>
+<p>The accelerometer is really going to report a proper measurement when it is standing still. if it is shaken, moved, bumped, or in free fall, the acceleration the accelerometer measures is no longer purely gravity based, and you are going to see that in your readings.</p>
+<h3>But I Need A Cleaner Reading</h3>
+<p>If you need a clean reading during movement, you need something this article won't provide, and that is a gyro and an accelerometer working in combination. Together they form something called an IMU - Inertial measurement unit. Correctly setup, and gyro is able to kick in where an accelerometer leave off, and vise versa. A gyro is great at measuring rotation, but has no understanding of orientation. And an accelerometer is good at determining orientation, but has no ability to keep track during rotation. </p>
+<h3>Hooking It Up</h3>
+<p>Connecting the ADXL335 to your Arduino is a snap. It powers off of the 3.3v, and the x,y,z connectors just connect to the 0,1,2 analog input pins. This accelerometer is a very simple and just outputs an analog voltage depending on the sensed value.</p>
+<h3>Code For The ADXL335 Or Other Analog Accelerometer</h3>
+<p>So here is some code: This code simply calculates 0-360º values for X,Y &amp; Z and prints it to the serial terminal. This code is not specific to the ADXL335, and with almost no tweaking you can make this work with any analog 3-axis accelerometer.</p>
+<p>Our Arduino's analog input pins are comparing the analog voltage from the accelerometer's analog outputs to 5v, and assigning number to that. If the Arduino senses 0V it reports 0, and 5V it reports 1023 ( you read more in the ADC Article in our wiki).  The highest value I read from the sensor when it was standing still was 402, so that is 1g, and the lowest was 265, so that is 0g. If you get funny output from the code, you will need to change this depending on the highest and lowest values you get from your accelerometer. (Ask us the discussion forum for help if you need it.) Just changing these values will make the code work for any other analog 3 axis accelerometer, not just the ADXL335.</p>
+<p>Because 265 (0g) was sensed at 0º, and 402 (1g) was sensed at 180º we are going to convert those values accordingly. But atan2, likes using -90 to 90 better, so we will do that instead. Lastly we convert the atan2 radian output to degrees, and voila, we have 360º measurements!</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="co1">//////////////////////////////////////////////////////////////////</span>
+<span class="co1">//©2011 bildr</span>
+<span class="co1">//Released under the MIT License - Please reuse change and share</span>
+<span class="co1">//Simple code for the ADXL335, prints calculated orientation via serial</span>
+<span class="co1">//////////////////////////////////////////////////////////////////</span>
+
+
+<span class="co1">//Analog read pins</span>
+<span class="kw4">const</span> <span class="kw4">int</span> xPin <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="kw4">const</span> <span class="kw4">int</span> yPin <span class="sy0">=</span> <span class="nu0">1</span><span class="sy0">;</span>
+<span class="kw4">const</span> <span class="kw4">int</span> zPin <span class="sy0">=</span> <span class="nu0">2</span><span class="sy0">;</span>
+
+<span class="co1">//The minimum and maximum values that came from</span>
+<span class="co1">//the accelerometer while standing still</span>
+<span class="co1">//You very well may need to change these</span>
+<span class="kw4">int</span> minVal <span class="sy0">=</span> <span class="nu0">265</span><span class="sy0">;</span>
+<span class="kw4">int</span> maxVal <span class="sy0">=</span> <span class="nu0">402</span><span class="sy0">;</span>
+
+
+<span class="co1">//to hold the caculated values</span>
+<span class="kw4">double</span> x<span class="sy0">;</span>
+<span class="kw4">double</span> y<span class="sy0">;</span>
+<span class="kw4">double</span> z<span class="sy0">;</span>
+
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span> 
+<span class="br0">}</span>
+
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+
+  <span class="co1">//read the analog values from the accelerometer</span>
+  <span class="kw4">int</span> xRead <span class="sy0">=</span> <span class="kw3">analogRead</span><span class="br0">(</span>xPin<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> yRead <span class="sy0">=</span> <span class="kw3">analogRead</span><span class="br0">(</span>yPin<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> zRead <span class="sy0">=</span> <span class="kw3">analogRead</span><span class="br0">(</span>zPin<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="co1">//convert read values to degrees -90 to 90 - Needed for atan2</span>
+  <span class="kw4">int</span> xAng <span class="sy0">=</span> <span class="kw3">map</span><span class="br0">(</span>xRead<span class="sy0">,</span> minVal<span class="sy0">,</span> maxVal<span class="sy0">,</span> <span class="sy0">-</span>90<span class="sy0">,</span> 90<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> yAng <span class="sy0">=</span> <span class="kw3">map</span><span class="br0">(</span>yRead<span class="sy0">,</span> minVal<span class="sy0">,</span> maxVal<span class="sy0">,</span> <span class="sy0">-</span>90<span class="sy0">,</span> 90<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> zAng <span class="sy0">=</span> <span class="kw3">map</span><span class="br0">(</span>zRead<span class="sy0">,</span> minVal<span class="sy0">,</span> maxVal<span class="sy0">,</span> <span class="sy0">-</span>90<span class="sy0">,</span> 90<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="co1">//Caculate 360deg values like so: atan2(-yAng, -zAng)</span>
+  <span class="co1">//atan2 outputs the value of -π to π (radians)</span>
+  <span class="co1">//We are then converting the radians to degrees</span>
+  x <span class="sy0">=</span> RAD_TO_DEG <span class="sy0">*</span> <span class="br0">(</span>atan2<span class="br0">(</span><span class="sy0">-</span>yAng<span class="sy0">,</span> <span class="sy0">-</span>zAng<span class="br0">)</span> <span class="sy0">+</span> PI<span class="br0">)</span><span class="sy0">;</span>
+  y <span class="sy0">=</span> RAD_TO_DEG <span class="sy0">*</span> <span class="br0">(</span>atan2<span class="br0">(</span><span class="sy0">-</span>xAng<span class="sy0">,</span> <span class="sy0">-</span>zAng<span class="br0">)</span> <span class="sy0">+</span> PI<span class="br0">)</span><span class="sy0">;</span>
+  z <span class="sy0">=</span> RAD_TO_DEG <span class="sy0">*</span> <span class="br0">(</span>atan2<span class="br0">(</span><span class="sy0">-</span>yAng<span class="sy0">,</span> <span class="sy0">-</span>xAng<span class="br0">)</span> <span class="sy0">+</span> PI<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="co1">//Output the caculations</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"x: "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>x<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">" | y: "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>y<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">" | z: "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span>z<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw3">delay</span><span class="br0">(</span>100<span class="br0">)</span><span class="sy0">;</span><span class="co1">//just here to slow down the serial output - Easier to read</span>
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<h3>Extending This</h3>
+<p>Even with the limitations of the ADXL335, you can do some great things. This is one time that I think just hooking a RGB LED to your Arduino with this makes a great device. Just kinda fun to play with, mixing colors as you turn it, so if you must use LEDs with this, I'm ok with that.</p>
+<p>This can really come in handy when you want to control anything based on orientation. So, get your tools ready, and build a reclining chair that knows when you reclined, and turns on the TV for you, OR... use it to master your posture as you balance a book on your head while recording the values. </p>
+<p><strong>Just a note:</strong> I had issues with connecting this with a servo. The servo was taking too much power from the Arduino, and the it was really throwing off the analog readings. So just note that. I did read that the servo needed a <a href="http://www.thebox.myzen.co.uk/Tutorial/De-coupling.html">decoupling capacitor</a> to work well, but I have not tried it.</p>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/sensing-orientation-with-the-adxl335-arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

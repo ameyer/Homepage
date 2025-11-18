@@ -1,0 +1,377 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Sensing Barometric Pressure | BMP085 + Arduino</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2011/06/BMP085.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+Light, location, temperature... What's next? Well, how about <a href="http://en.wikipedia.org/wiki/Atmospheric_pressure">Barometric pressure</a>? You know.. that thing that determines so much of our weather. Well the <a href="http://www.sparkfun.com/products/9694">BMP085 Barometric Pressure sensor, available at SparkFun</a> is a great little sensor capable of sensing such small changes in barometric pressure it can be used as a pretty precise altimeter as well. And, because no Barometric pressure sensor would be complete without a temperature reading, the BMP085 has an imbedded thermometer. It also looks cool!
+<p>For this example, the way we will be calculating altitude is imprecise and does not compensate for temperature or many other things that can contribute to differences. But, if you use it as a comparison against itself during a hour long period (barometric pressure also fluctuates throughout the day), you can get a pretty accurate difference reading.</p>
+</div>
+<div class="rightColumn">
+<a href="images/2011/06/BMP085-hookup.png"><img alt="" class="alignleft size-medium wp-image-1480" height="230" src="images/2011/06/BMP085-hookup-400x230.png" title="BMP085-hookup" width="400"/></a>
+</div>
+</div>
+<h4>The reading differs from my weather report</h4>
+<p>Im not going to get into why this is, but to make comparisons easier, your weather report uses a sea-level compensated reading, not an actual reading. This is an actual reading.</p>
+<h3>Hooking it up</h3>
+<p>Hooking it up to your Arduino is pretty simple, the BMP085 is an I2C device. I2C is a 2-wire serial connection, so you just need to connect the BMP085 to power (3.3v) and ground, then the SDA (Data) and SCL (Clock) lines to your Arduino for communication. On your Arduino (everything but the mega) SDA is on analog pin 4, and SCL is on analog pin 5. On an Arduino Mega, SDA is digital 20, and SCL is digital 21.</p>
+<h3>Code</h3>
+<p>The code for this is largely copied and based off of Jim Lindblom's example from SparkFun  (Thanks Jim!). I changed a few things so it is just easier for you to use the readings in calculations, and I added the altitude reading as well. <strong>If you know of a better way to calculate altitude, please let us know so we can include it!</strong></p>
+<p>The code simply outputs the temperature, pressure, and altitude in the serial terminal.</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;">
+
+<span class="coMULTI">/*Based largely on code by  Jim Lindblom
+
+ Get pressure, altitude, and temperature from the BMP085.
+ Serial.print it out at 9600 baud to serial monitor.
+ */</span>
+
+<span class="co2">#include &lt;Wire.h&gt;</span>
+
+<span class="co2">#define BMP085_ADDRESS 0x77  // I2C address of BMP085</span>
+
+<span class="kw4">const</span> <span class="kw4">unsigned</span> <span class="kw4">char</span> OSS <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>  <span class="co1">// Oversampling Setting</span>
+
+<span class="co1">// Calibration values</span>
+<span class="kw4">int</span> ac1<span class="sy0">;</span>
+<span class="kw4">int</span> ac2<span class="sy0">;</span>
+<span class="kw4">int</span> ac3<span class="sy0">;</span>
+<span class="kw4">unsigned</span> <span class="kw4">int</span> ac4<span class="sy0">;</span>
+<span class="kw4">unsigned</span> <span class="kw4">int</span> ac5<span class="sy0">;</span>
+<span class="kw4">unsigned</span> <span class="kw4">int</span> ac6<span class="sy0">;</span>
+<span class="kw4">int</span> b1<span class="sy0">;</span>
+<span class="kw4">int</span> b2<span class="sy0">;</span>
+<span class="kw4">int</span> mb<span class="sy0">;</span>
+<span class="kw4">int</span> mc<span class="sy0">;</span>
+<span class="kw4">int</span> md<span class="sy0">;</span>
+
+<span class="co1">// b5 is calculated in bmp085GetTemperature(...), this variable is also used in bmp085GetPressure(...)</span>
+<span class="co1">// so ...Temperature(...) must be called before ...Pressure(...).</span>
+<span class="kw4">long</span> b5<span class="sy0">;</span> 
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">begin</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+  bmp085Calibration<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span>
+  <span class="kw4">float</span> temperature <span class="sy0">=</span> bmp085GetTemperature<span class="br0">(</span>bmp085ReadUT<span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">//MUST be called first</span>
+  <span class="kw4">float</span> pressure <span class="sy0">=</span> bmp085GetPressure<span class="br0">(</span>bmp085ReadUP<span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">float</span> atm <span class="sy0">=</span> pressure <span class="sy0">/</span> <span class="nu0">101325</span><span class="sy0">;</span> <span class="co1">// "standard atmosphere"</span>
+  <span class="kw4">float</span> altitude <span class="sy0">=</span> calcAltitude<span class="br0">(</span>pressure<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//Uncompensated caculation - in Meters </span>
+
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"Temperature: "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>temperature<span class="sy0">,</span> 2<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//display 2 decimal places</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span><span class="st0">"deg C"</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"Pressure: "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>pressure<span class="sy0">,</span> 0<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//whole number only.</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span><span class="st0">" Pa"</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"Standard Atmosphere: "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span>atm<span class="sy0">,</span> 4<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//display 4 decimal places</span>
+
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"Altitude: "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>altitude<span class="sy0">,</span> 2<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//display 2 decimal places</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span><span class="st0">" M"</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span><span class="co1">//line break</span>
+
+  <span class="kw3">delay</span><span class="br0">(</span>1000<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//wait a second and get values again.</span>
+<span class="br0">}</span>
+
+<span class="co1">// Stores all of the bmp085's calibration values into global variables</span>
+<span class="co1">// Calibration values are required to calculate temp and pressure</span>
+<span class="co1">// This function should be called at the beginning of the program</span>
+<span class="kw4">void</span> bmp085Calibration<span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span>
+  ac1 <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xAA<span class="br0">)</span><span class="sy0">;</span>
+  ac2 <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xAC<span class="br0">)</span><span class="sy0">;</span>
+  ac3 <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xAE<span class="br0">)</span><span class="sy0">;</span>
+  ac4 <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xB0<span class="br0">)</span><span class="sy0">;</span>
+  ac5 <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xB2<span class="br0">)</span><span class="sy0">;</span>
+  ac6 <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xB4<span class="br0">)</span><span class="sy0">;</span>
+  b1 <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xB6<span class="br0">)</span><span class="sy0">;</span>
+  b2 <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xB8<span class="br0">)</span><span class="sy0">;</span>
+  mb <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xBA<span class="br0">)</span><span class="sy0">;</span>
+  mc <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xBC<span class="br0">)</span><span class="sy0">;</span>
+  md <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xBE<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="co1">// Calculate temperature in deg C</span>
+<span class="kw4">float</span> bmp085GetTemperature<span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">int</span> ut<span class="br0">)</span><span class="br0">{</span>
+  <span class="kw4">long</span> x1<span class="sy0">,</span> x2<span class="sy0">;</span>
+
+  x1 <span class="sy0">=</span> <span class="br0">(</span><span class="br0">(</span><span class="br0">(</span><span class="kw4">long</span><span class="br0">)</span>ut <span class="sy0">-</span> <span class="br0">(</span><span class="kw4">long</span><span class="br0">)</span>ac6<span class="br0">)</span><span class="sy0">*</span><span class="br0">(</span><span class="kw4">long</span><span class="br0">)</span>ac5<span class="br0">)</span> <span class="sy0">&gt;&gt;</span> <span class="nu0">15</span><span class="sy0">;</span>
+  x2 <span class="sy0">=</span> <span class="br0">(</span><span class="br0">(</span><span class="kw4">long</span><span class="br0">)</span>mc <span class="sy0">&lt;&lt;</span> 11<span class="br0">)</span><span class="sy0">/</span><span class="br0">(</span>x1 <span class="sy0">+</span> md<span class="br0">)</span><span class="sy0">;</span>
+  b5 <span class="sy0">=</span> x1 <span class="sy0">+</span> x2<span class="sy0">;</span>
+
+  <span class="kw4">float</span> temp <span class="sy0">=</span> <span class="br0">(</span><span class="br0">(</span>b5 <span class="sy0">+</span> 8<span class="br0">)</span><span class="sy0">&gt;&gt;</span>4<span class="br0">)</span><span class="sy0">;</span>
+  temp <span class="sy0">=</span> temp <span class="sy0">/</span><span class="nu0">10</span><span class="sy0">;</span>
+
+  <span class="kw1">return</span> temp<span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="co1">// Calculate pressure given up</span>
+<span class="co1">// calibration values must be known</span>
+<span class="co1">// b5 is also required so bmp085GetTemperature(...) must be called first.</span>
+<span class="co1">// Value returned will be pressure in units of Pa.</span>
+<span class="kw4">long</span> bmp085GetPressure<span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">long</span> up<span class="br0">)</span><span class="br0">{</span>
+  <span class="kw4">long</span> x1<span class="sy0">,</span> x2<span class="sy0">,</span> x3<span class="sy0">,</span> b3<span class="sy0">,</span> b6<span class="sy0">,</span> p<span class="sy0">;</span>
+  <span class="kw4">unsigned</span> <span class="kw4">long</span> b4<span class="sy0">,</span> b7<span class="sy0">;</span>
+
+  b6 <span class="sy0">=</span> b5 <span class="sy0">-</span> <span class="nu0">4000</span><span class="sy0">;</span>
+  <span class="co1">// Calculate B3</span>
+  x1 <span class="sy0">=</span> <span class="br0">(</span>b2 <span class="sy0">*</span> <span class="br0">(</span>b6 <span class="sy0">*</span> b6<span class="br0">)</span><span class="sy0">&gt;&gt;</span>12<span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">11</span><span class="sy0">;</span>
+  x2 <span class="sy0">=</span> <span class="br0">(</span>ac2 <span class="sy0">*</span> b6<span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">11</span><span class="sy0">;</span>
+  x3 <span class="sy0">=</span> x1 <span class="sy0">+</span> x2<span class="sy0">;</span>
+  b3 <span class="sy0">=</span> <span class="br0">(</span><span class="br0">(</span><span class="br0">(</span><span class="br0">(</span><span class="br0">(</span><span class="kw4">long</span><span class="br0">)</span>ac1<span class="br0">)</span><span class="sy0">*</span>4 <span class="sy0">+</span> x3<span class="br0">)</span><span class="sy0">&lt;&lt;</span>OSS<span class="br0">)</span> <span class="sy0">+</span> 2<span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">2</span><span class="sy0">;</span>
+
+  <span class="co1">// Calculate B4</span>
+  x1 <span class="sy0">=</span> <span class="br0">(</span>ac3 <span class="sy0">*</span> b6<span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">13</span><span class="sy0">;</span>
+  x2 <span class="sy0">=</span> <span class="br0">(</span>b1 <span class="sy0">*</span> <span class="br0">(</span><span class="br0">(</span>b6 <span class="sy0">*</span> b6<span class="br0">)</span><span class="sy0">&gt;&gt;</span>12<span class="br0">)</span><span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">16</span><span class="sy0">;</span>
+  x3 <span class="sy0">=</span> <span class="br0">(</span><span class="br0">(</span>x1 <span class="sy0">+</span> x2<span class="br0">)</span> <span class="sy0">+</span> 2<span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">2</span><span class="sy0">;</span>
+  b4 <span class="sy0">=</span> <span class="br0">(</span>ac4 <span class="sy0">*</span> <span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">long</span><span class="br0">)</span><span class="br0">(</span>x3 <span class="sy0">+</span> 32768<span class="br0">)</span><span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">15</span><span class="sy0">;</span>
+
+  b7 <span class="sy0">=</span> <span class="br0">(</span><span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">long</span><span class="br0">)</span><span class="br0">(</span>up <span class="sy0">-</span> b3<span class="br0">)</span> <span class="sy0">*</span> <span class="br0">(</span>50000<span class="sy0">&gt;&gt;</span>OSS<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw1">if</span> <span class="br0">(</span>b7 <span class="sy0">&lt;</span> 0x80000000<span class="br0">)</span>
+    p <span class="sy0">=</span> <span class="br0">(</span>b7<span class="sy0">&lt;&lt;</span>1<span class="br0">)</span><span class="sy0">/</span>b4<span class="sy0">;</span>
+  <span class="kw1">else</span>
+    p <span class="sy0">=</span> <span class="br0">(</span>b7<span class="sy0">/</span>b4<span class="br0">)</span><span class="sy0">&lt;&lt;</span><span class="nu0">1</span><span class="sy0">;</span>
+
+  x1 <span class="sy0">=</span> <span class="br0">(</span>p<span class="sy0">&gt;&gt;</span>8<span class="br0">)</span> <span class="sy0">*</span> <span class="br0">(</span>p<span class="sy0">&gt;&gt;</span>8<span class="br0">)</span><span class="sy0">;</span>
+  x1 <span class="sy0">=</span> <span class="br0">(</span>x1 <span class="sy0">*</span> 3038<span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">16</span><span class="sy0">;</span>
+  x2 <span class="sy0">=</span> <span class="br0">(</span><span class="sy0">-</span>7357 <span class="sy0">*</span> p<span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">16</span><span class="sy0">;</span>
+  p <span class="sy0">+=</span> <span class="br0">(</span>x1 <span class="sy0">+</span> x2 <span class="sy0">+</span> 3791<span class="br0">)</span><span class="sy0">&gt;&gt;</span><span class="nu0">4</span><span class="sy0">;</span>
+
+  <span class="kw4">long</span> temp <span class="sy0">=</span> p<span class="sy0">;</span>
+  <span class="kw1">return</span> temp<span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="co1">// Read 1 byte from the BMP085 at 'address'</span>
+<span class="kw4">char</span> bmp085Read<span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">char</span> address<span class="br0">)</span>
+<span class="br0">{</span>
+  <span class="kw4">unsigned</span> <span class="kw4">char</span> data<span class="sy0">;</span>
+
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>BMP085_ADDRESS<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>address<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+  Wire.<span class="me1">requestFrom</span><span class="br0">(</span>BMP085_ADDRESS<span class="sy0">,</span> 1<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw1">while</span><span class="br0">(</span><span class="sy0">!</span>Wire.<span class="me1">available</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span>
+    <span class="sy0">;</span>
+
+  <span class="kw1">return</span> Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="co1">// Read 2 bytes from the BMP085</span>
+<span class="co1">// First byte will be from 'address'</span>
+<span class="co1">// Second byte will be from 'address'+1</span>
+<span class="kw4">int</span> bmp085ReadInt<span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">char</span> address<span class="br0">)</span>
+<span class="br0">{</span>
+  <span class="kw4">unsigned</span> <span class="kw4">char</span> msb<span class="sy0">,</span> lsb<span class="sy0">;</span>
+
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>BMP085_ADDRESS<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>address<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+  Wire.<span class="me1">requestFrom</span><span class="br0">(</span>BMP085_ADDRESS<span class="sy0">,</span> 2<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw1">while</span><span class="br0">(</span>Wire.<span class="me1">available</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">&lt;</span>2<span class="br0">)</span>
+    <span class="sy0">;</span>
+  msb <span class="sy0">=</span> Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+  lsb <span class="sy0">=</span> Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw1">return</span> <span class="br0">(</span><span class="kw4">int</span><span class="br0">)</span> msb<span class="sy0">&lt;&lt;</span>8 <span class="sy0">|</span> lsb<span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="co1">// Read the uncompensated temperature value</span>
+<span class="kw4">unsigned</span> <span class="kw4">int</span> bmp085ReadUT<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="kw4">unsigned</span> <span class="kw4">int</span> ut<span class="sy0">;</span>
+
+  <span class="co1">// Write 0x2E into Register 0xF4</span>
+  <span class="co1">// This requests a temperature reading</span>
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>BMP085_ADDRESS<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>0xF4<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>0x2E<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="co1">// Wait at least 4.5ms</span>
+  <span class="kw3">delay</span><span class="br0">(</span>5<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="co1">// Read two bytes from registers 0xF6 and 0xF7</span>
+  ut <span class="sy0">=</span> bmp085ReadInt<span class="br0">(</span>0xF6<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw1">return</span> ut<span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="co1">// Read the uncompensated pressure value</span>
+<span class="kw4">unsigned</span> <span class="kw4">long</span> bmp085ReadUP<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+
+  <span class="kw4">unsigned</span> <span class="kw4">char</span> msb<span class="sy0">,</span> lsb<span class="sy0">,</span> xlsb<span class="sy0">;</span>
+  <span class="kw4">unsigned</span> <span class="kw4">long</span> up <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+
+  <span class="co1">// Write 0x34+(OSS&lt;&lt;6) into register 0xF4</span>
+  <span class="co1">// Request a pressure reading w/ oversampling setting</span>
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>BMP085_ADDRESS<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>0xF4<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>0x34 <span class="sy0">+</span> <span class="br0">(</span>OSS<span class="sy0">&lt;&lt;</span>6<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="co1">// Wait for conversion, delay time dependent on OSS</span>
+  <span class="kw3">delay</span><span class="br0">(</span>2 <span class="sy0">+</span> <span class="br0">(</span>3<span class="sy0">&lt;&lt;</span>OSS<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="co1">// Read register 0xF6 (MSB), 0xF7 (LSB), and 0xF8 (XLSB)</span>
+  msb <span class="sy0">=</span> bmp085Read<span class="br0">(</span>0xF6<span class="br0">)</span><span class="sy0">;</span>
+  lsb <span class="sy0">=</span> bmp085Read<span class="br0">(</span>0xF7<span class="br0">)</span><span class="sy0">;</span>
+  xlsb <span class="sy0">=</span> bmp085Read<span class="br0">(</span>0xF8<span class="br0">)</span><span class="sy0">;</span>
+
+  up <span class="sy0">=</span> <span class="br0">(</span><span class="br0">(</span><span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">long</span><span class="br0">)</span> msb <span class="sy0">&lt;&lt;</span> 16<span class="br0">)</span> <span class="sy0">|</span> <span class="br0">(</span><span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">long</span><span class="br0">)</span> lsb <span class="sy0">&lt;&lt;</span> 8<span class="br0">)</span> <span class="sy0">|</span> <span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">long</span><span class="br0">)</span> xlsb<span class="br0">)</span> <span class="sy0">&gt;&gt;</span> <span class="br0">(</span>8<span class="sy0">-</span>OSS<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw1">return</span> up<span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> writeRegister<span class="br0">(</span><span class="kw4">int</span> deviceAddress<span class="sy0">,</span> <span class="kw4">byte</span> address<span class="sy0">,</span> <span class="kw4">byte</span> val<span class="br0">)</span> <span class="br0">{</span>
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>deviceAddress<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// start transmission to device </span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>address<span class="br0">)</span><span class="sy0">;</span>       <span class="co1">// send register address</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>val<span class="br0">)</span><span class="sy0">;</span>         <span class="co1">// send value to write</span>
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>     <span class="co1">// end transmission</span>
+<span class="br0">}</span>
+
+<span class="kw4">int</span> readRegister<span class="br0">(</span><span class="kw4">int</span> deviceAddress<span class="sy0">,</span> <span class="kw4">byte</span> address<span class="br0">)</span><span class="br0">{</span>
+
+  <span class="kw4">int</span> v<span class="sy0">;</span>
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>deviceAddress<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>address<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// register to read</span>
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+  Wire.<span class="me1">requestFrom</span><span class="br0">(</span>deviceAddress<span class="sy0">,</span> 1<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// read a byte</span>
+
+  <span class="kw1">while</span><span class="br0">(</span><span class="sy0">!</span>Wire.<span class="me1">available</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="co1">// waiting</span>
+  <span class="br0">}</span>
+
+  v <span class="sy0">=</span> Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw1">return</span> v<span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">float</span> calcAltitude<span class="br0">(</span><span class="kw4">float</span> pressure<span class="br0">)</span><span class="br0">{</span>
+
+  <span class="kw4">float</span> A <span class="sy0">=</span> pressure<span class="sy0">/</span><span class="nu0">101325</span><span class="sy0">;</span>
+  <span class="kw4">float</span> B <span class="sy0">=</span> 1<span class="sy0">/</span><span class="nu16">5.25588</span><span class="sy0">;</span>
+  <span class="kw4">float</span> C <span class="sy0">=</span> <span class="kw3">pow</span><span class="br0">(</span>A<span class="sy0">,</span>B<span class="br0">)</span><span class="sy0">;</span>
+  C <span class="sy0">=</span> 1 <span class="sy0">-</span> C<span class="sy0">;</span>
+  C <span class="sy0">=</span> C <span class="sy0">/</span><span class="nu16">0.0000225577</span><span class="sy0">;</span>
+
+  <span class="kw1">return</span> C<span class="sy0">;</span>
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/bmp085-arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

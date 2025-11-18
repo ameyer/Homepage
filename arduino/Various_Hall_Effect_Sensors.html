@@ -1,0 +1,157 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>A Strange Attraction. Various Hall Effect Sensors</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2011/03/hall_effect_sensors.jpg"/></p>
+<div class="wideBody">
+I came pretty close to calling this one "Magnets, How do they work?" But I thought that might confuse more than it would amuse. All jokes aside, hall effect sensors are pretty cool, and also pretty simple to use, but there are a few types you may not know about and I figured it would be a good time to introduce them incase your next project was In need of sensing some magnetic forces. 
+<p>If you don't know, a hall-effect sensor is a device that reacts to a magnetic field. The most common reaction being the sensor acting as a digital switch "turning on" in the presence of a strong enough magnetic field. And actually most people when first looking into them only know of these. But the reality is that there any many different types, from ones that output an analog signal depending on the strength and polarity of a magnet, to ones that latch on when a strong enough field is sensed, but won't unlatch until an equally strong, opposing field is sensed. </p>
+<p>Hall effect sensors are all rated to work with a specific strength of magnet field (measured in <a href="http://en.wikipedia.org/wiki/Gauss_(unit)">Gauss</a>) which dissipates with distance from the magnet. Just like sound, it is softer when you are further away from the source. The only reason this is important, is because the distance a magnet needs to get to one of these sensors to trigger it is totally dependent of the magnets strength. So a really powerful magnet will trigger the sensor from a greater distance than a weak magnet. Sounds obvious I know, but these sensors also have a max Gauss rating as well. So, too powerful of a magnet, getting too close, can mess them up and eventually break them. Most sensors are sold in a wide range of sensitivity. The 3 in this article work well with household magnets, but if you need ones to work with very strong magnets, they are available.</p>
+<p><strong>The 3 sensors we will be going over are:</strong><br/>
+<a href="http://parts.digikey.com/1/parts/948149-sensor-hallogic-hall-effect-oh090u.html">OPTEK Technology OH090U - Simple Hall Effect Sensor</a><br/>
+Melexis US1881 - Latching Hall Effect Sensor<br/>
+Allegro A1321 - Ratiometric Linear Hall Effect Sensor</p>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<h2>OPTEK Technology OH090U</h2>
+<p>The OH090U (<a href="http://parts.digikey.com/1/parts/948149-sensor-hallogic-hall-effect-oh090u.html">available from digikey</a> at $1.75) is probably what you think of when you think of a hall effect sensor, this guy acts just like a digital reed switch, when a magnetic field gets close enough, it switches. In the case of the OH090U, it switches LOW. So when no magnetic field of the minimum trigger value is sensed, the  OH090U output pin will be equal to the source voltage (4.5V to 24V), and when a field of the minimum trigger strength is within range, the output pin will be ground, or 0v.</p>
+<p>One nice thing about the OH090U is that it <a href="http://en.wikipedia.org/wiki/Schmitt_trigger">schmitt triggers</a>. Meaning there is a gap between when it triggers on, and triggers off. So if the sensor triggers on at 90 gauss, it wont release until it drops below 65 gauss. This keeps it from triggering on/off/on/off if a magnet is right on the cusp of that minimum trigger spot.</p>
+<h4>Hooking It Up</h4>
+<p>The doc sheet for the OH090U says you need a capacitor between ground and the out pin, however, in my testing, it worked perfectly without it. This is probably to smooth out the signal, and 95% of the time, this is going to be ok with out the capacitor, but if you plan on using this for automative purposes or other situations that could put people in harm's way if it were to misfire, use the capacitor, seriously. The sensor does need a 500-860Ω resistor between VCC (V+) and the output pin for it to work.</p>
+</div>
+<div class="rightColumn">
+<a href="images/2011/04/0h090u1.png"><img alt="" class="alignleft size-medium wp-image-1769" height="302" src="images/2011/04/0h090u1-400x302.png" title="0h090u" width="400"/></a>
+</div>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<h2>Melexis US1881</h2>
+<p>The Melexis US1881 (<a href="http://www.sparkfun.com/products/9312">available from sparkfun</a> at $0.95) is a Latching Hall Effect Sensor meaning that once it is triggered it latches and will not unlatch until a magnetic force of reverse polarity and strength is sensed. So If the north pole of a magnet turned it on, the south pole of a magnet is then needed to turn it off. When the US1881 is triggered the output will be equal to the source voltage (3.5 to 24V) and unlatched will output 0v/ground. </p>
+<p>I did find that using an overly strong magnet with this sensor would sometimes not latch it or would latch it to the point that it was hard to unlatch. So keep your <a href="http://www.amazingmagnets.com/sf-rod-magnets.aspx">1in rare earth magnets</a> away from this one.</p>
+<h4>Hooking It Up</h4>
+<p>Just like the OH090U above, the US1881's documentation recommends some capacitors from ground to output and VCC. But again, I tested it without them, and as long as you have a 10K resistor between VCC and the output, it will work for 95% of what you need to do. From what I could tell, the capacitors are just there to smooth the output and stop the signal from bouncing, but most microcontrollers like the Arduino will not have any issue with this. If you find that the sensor seems to be triggering more than once each time it should, try putting the capacitors in, it could be your problem.</p>
+</div>
+<div class="rightColumn">
+<a href="images/2011/04/us1881.png"><img alt="" class="noFrame" src="images/2011/04/us1881-400x295.png" title="us1881"/></a>
+</div>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<h2>Allegro A1321</h2>
+<p>The Allegro A1321 (<a href="http://shop.moderndevice.com/products/a1321-hall-effect-sensor">available from modern device</a> at $2.60) is a linear hall effect sensor. Unlike the other two, this sensor does not have a wide operating voltage range, and is limited to 4.5 to 5.5v (Assuming 5v for article). When no minimum magnetic feild is sensed, this sensor will output half of the source voltage, (2.5v). When the north side of a magnet approaches the face of the sensor, the output voltage will linearly ramp up to the source (5v) and when the south pole of a magnet approaches the face of the A1321, the output will linearly drop to ground (0V).</p>
+<h4>Hooking It Up</h4>
+<p>Unlike the other 2 sensors, no external parts are needed to use the A1321, just connect 5v to pin 1, ground to pin 2, and pin 3 will output a linear voltage as described above.</p>
+</div>
+<div class="rightColumn">
+<a href="images/2011/04/a1321.png"><img alt="" class="noFrame" src="images/2011/04/a1321-400x295.png" title="a1321"/></a>
+</div>
+</div>
+<h3>Video</h3>
+<p>The behaviors of all of the above sensors are shown in this video.</p>
+<div style="clear:both">
+<iframe frameborder="0" height="534" src="http://player.vimeo.com/video/21847015?byline=0&amp;portrait=0" width="949"></iframe>
+</div>
+<h3>Extending this</h3>
+<p>Magnets are really cool, on their own, but mixed with hall effect sensors they can do some pretty cool things, like <a href="http://www.youtube.com/watch?v=7o4TdX3o098">levitation</a>! You can use them to actuality count when a wheel or gear rotates by placing a small magnet on the end of the wheel or gear. The A1321 can be used to sense when a lamp is turned on by placing it over the cord. When the lamp turns on a small magnetic field is produced, enough to be sensed. In my research it seems companies are really trying to push their use in steering assemblies for cars, acting as high precision rotary encoders. But don't do something so boring like that.... create secret locks that require you to place a magnet on a certain spot to open, fill a floor with hundreds of them and place magnets on your shoes and watch the floor light up where ever you walk. WAIT...</p>
+<p><strong>Use the latching ones, get like hundreds of them, and place them with LEDs under a resin floor. Put north facing magnets on your shoes, and south on other people's shoes and see when you have walked, but others have not! Yeah, it's late.</strong></p>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/various-hall-effect-sensors">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

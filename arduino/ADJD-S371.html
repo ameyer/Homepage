@@ -1,0 +1,469 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Sensing color with the ADJD-S371 + Arduino</h2>
+<div class="postContent">
+<p><img alt="" class="noFrame" src="images/2010/12/adjd.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+<p>About 2 years ago I picked up a ADJD-S371 color sensor from <a href="http://www.sparkfun.com/">Sparkfun</a> to work with my arduino. I spent a few days getting it to work, but finally got it going pretty well. I still get a few emails here and there asking for help with it. So I figured I would start bildr's tutorial posts off with this one.</p>
+<p>Before we begin, I want to say that I could not have done this without the awesome help of Marcus over at <a href="http://interactive-matter.org/">Interactive Matter</a> - Almost all of this code is of his hand, and he has gracefully released the code to bildr under the <a href="./our-licensing-choice">MIT license</a> for users to build off of.</p>
+<p>Im a huge fan of getting to the punch, it is what bildr is all about. So if you just want something to start with... here you go.</p>
+</div>
+<div class="rightColumn"><a href="images/2010/12/adjd2.png"><br/>
+<img alt="" class="noFrame" src="images/2010/12/adjd2.png" width="430"/><br/>
+</a></div>
+</div>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="co1">//Configure gain here</span>
+<span class="co1">//Higher numbers = less sencitive</span>
+<span class="co1">// 0x00 through 0x0f</span>
+<span class="kw4">int</span> redGain <span class="sy0">=</span> <span class="nu12">0x03</span><span class="sy0">;</span>
+<span class="kw4">int</span> greenGain <span class="sy0">=</span> <span class="nu12">0x0</span><span class="sy0">;</span>
+<span class="kw4">int</span> blueGain <span class="sy0">=</span> <span class="nu12">0x0f</span><span class="sy0">;</span>
+<span class="kw4">int</span> clearGain <span class="sy0">=</span> <span class="nu12">0x01</span><span class="sy0">;</span>
+
+<span class="co1">//RGB LED pins</span>
+<span class="co1">//Digital PWM pins</span>
+<span class="kw4">int</span> redPin <span class="sy0">=</span> <span class="nu0">9</span><span class="sy0">;</span>
+<span class="kw4">int</span> greenPin <span class="sy0">=</span> <span class="nu0">10</span><span class="sy0">;</span>
+<span class="kw4">int</span> bluePin <span class="sy0">=</span> <span class="nu0">11</span><span class="sy0">;</span>
+
+
+
+<span class="co1">//Include the I2C Arduino library</span>
+<span class="co2">#include &lt;Wire.h&gt;</span>
+
+<span class="co1">//7 bit I2C address of this sensor</span>
+<span class="co2">#define I2C_ADDRESS 0x74</span>
+
+<span class="co2">#define REG_CAP_RED		0x06</span>
+<span class="co2">#define REG_CAP_GREEN	 0x07</span>
+<span class="co2">#define REG_CAP_BLUE	 0x08</span>
+<span class="co2">#define REG_CAP_CLEAR	 0x09</span>
+
+<span class="co2">#define REG_INT_RED_LO	0x0A</span>
+<span class="co2">#define REG_INT_RED_HI	0x0B</span>
+<span class="co2">#define REG_INT_GREEN_LO 0x0C</span>
+<span class="co2">#define REG_INT_GREEN_HI 0x0D</span>
+<span class="co2">#define REG_INT_BLUE_LO	0x0E</span>
+<span class="co2">#define REG_INT_BLUE_HI	0x0F</span>
+<span class="co2">#define REG_INT_CLEAR_LO 0x10</span>
+<span class="co2">#define REG_INT_CLEAR_HI 0x11</span>
+
+<span class="co2">#define REG_DATA_RED_LO	0x40</span>
+<span class="co2">#define REG_DATA_RED_HI	0x41</span>
+<span class="co2">#define REG_DATA_GREEN_LO 0x42</span>
+<span class="co2">#define REG_DATA_GREEN_HI 0x43</span>
+<span class="co2">#define REG_DATA_BLUE_LO 0x44</span>
+<span class="co2">#define REG_DATA_BLUE_HI 0x45</span>
+<span class="co2">#define REG_DATA_CLEAR_LO 0x46</span>
+<span class="co2">#define REG_DATA_CLEAR_HI 0x47</span>
+
+<span class="kw4">float</span> redFactor<span class="sy0">=</span><span class="nu0">1</span><span class="sy0">;</span>
+<span class="kw4">float</span> blueFactor<span class="sy0">=</span><span class="nu0">1</span><span class="sy0">;</span>
+<span class="kw4">float</span> greenFactor<span class="sy0">=</span><span class="nu0">1</span><span class="sy0">;</span>
+
+<span class="co1">//initial darkLevel;</span>
+<span class="kw4">int</span> calibrationDarkness <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="kw4">byte</span> calibrationRed <span class="sy0">=</span> <span class="nu0">5</span><span class="sy0">;</span>
+<span class="kw4">byte</span> calibrationGreen <span class="sy0">=</span> <span class="nu0">5</span><span class="sy0">;</span>
+<span class="kw4">byte</span> calibrationBlue <span class="sy0">=</span> <span class="nu0">5</span><span class="sy0">;</span>
+
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span><span class="br0">{</span>
+	<span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span>
+	Wire.<span class="me1">begin</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+	<span class="co1">// sensor gain setting (Avago app note 5330)</span>
+	<span class="co1">// CAPs are 4bit (higher value will result in lower output)</span>
+	set_register<span class="br0">(</span>REG_CAP_RED<span class="sy0">,</span> redGain<span class="br0">)</span><span class="sy0">;</span>
+	set_register<span class="br0">(</span>REG_CAP_GREEN<span class="sy0">,</span> greenGain<span class="br0">)</span><span class="sy0">;</span>
+	set_register<span class="br0">(</span>REG_CAP_BLUE<span class="sy0">,</span> blueGain<span class="br0">)</span><span class="sy0">;</span>
+	set_register<span class="br0">(</span>REG_CAP_CLEAR<span class="sy0">,</span> clearGain<span class="br0">)</span><span class="sy0">;</span>
+
+	<span class="kw4">int</span> ledGain <span class="sy0">=</span> getColorGain<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+	set_gain<span class="br0">(</span>REG_INT_RED_LO<span class="sy0">,</span>ledGain<span class="br0">)</span><span class="sy0">;</span>
+	set_gain<span class="br0">(</span>REG_INT_GREEN_LO<span class="sy0">,</span>ledGain<span class="br0">)</span><span class="sy0">;</span>
+	set_gain<span class="br0">(</span>REG_INT_BLUE_LO<span class="sy0">,</span>ledGain<span class="br0">)</span><span class="sy0">;</span>
+
+	performMeasurement<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+	<span class="kw4">int</span> red<span class="sy0">=</span>get_readout<span class="br0">(</span>REG_DATA_RED_LO<span class="br0">)</span><span class="sy0">;</span>
+	<span class="kw4">int</span> green<span class="sy0">=</span>get_readout<span class="br0">(</span>REG_DATA_GREEN_LO<span class="br0">)</span><span class="sy0">;</span>
+	<span class="kw4">int</span> blue<span class="sy0">=</span>get_readout<span class="br0">(</span>REG_DATA_BLUE_LO<span class="br0">)</span><span class="sy0">;</span>
+
+	<span class="kw4">int</span> m<span class="sy0">=</span><span class="nu0">2000</span><span class="sy0">;</span> <span class="co1">//bigger anyway</span>
+	m<span class="sy0">=</span><span class="kw3">min</span><span class="br0">(</span>m<span class="sy0">,</span>red<span class="br0">)</span><span class="sy0">;</span>
+	m<span class="sy0">=</span><span class="kw3">min</span><span class="br0">(</span>m<span class="sy0">,</span>green<span class="br0">)</span><span class="sy0">;</span>
+	m<span class="sy0">=</span><span class="kw3">min</span><span class="br0">(</span>m<span class="sy0">,</span>blue<span class="br0">)</span><span class="sy0">;</span>
+
+	<span class="co1">//Serial.print("m - ");</span>
+	<span class="co1">//Serial.println(m);</span>
+
+	redFactor<span class="sy0">=</span><span class="br0">(</span><span class="br0">(</span><span class="kw4">float</span><span class="br0">)</span>m<span class="sy0">*</span>255.0<span class="br0">)</span><span class="sy0">/</span><span class="br0">(</span>1000<span class="sy0">*</span><span class="br0">(</span><span class="kw4">float</span><span class="br0">)</span>red<span class="br0">)</span><span class="sy0">;</span>
+	greenFactor<span class="sy0">=</span><span class="br0">(</span><span class="br0">(</span><span class="kw4">float</span><span class="br0">)</span>m<span class="sy0">*</span>255.0<span class="br0">)</span><span class="sy0">/</span><span class="br0">(</span>1000<span class="sy0">*</span><span class="br0">(</span><span class="kw4">float</span><span class="br0">)</span>green<span class="br0">)</span><span class="sy0">;</span>
+	blueFactor<span class="sy0">=</span><span class="br0">(</span><span class="br0">(</span><span class="kw4">float</span><span class="br0">)</span>m<span class="sy0">*</span>255.0<span class="br0">)</span><span class="sy0">/</span><span class="br0">(</span>1000<span class="sy0">*</span><span class="br0">(</span><span class="kw4">float</span><span class="br0">)</span>blue<span class="br0">)</span><span class="sy0">;</span>
+
+
+<span class="br0">}</span>
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span> 
+
+	<span class="kw4">int</span> clearGain <span class="sy0">=</span> getClearGain<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+	set_gain<span class="br0">(</span>REG_INT_CLEAR_LO<span class="sy0">,</span>clearGain<span class="br0">)</span><span class="sy0">;</span>
+	<span class="kw4">int</span> colorGain <span class="sy0">=</span> getColorGain<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+	set_gain<span class="br0">(</span>REG_INT_RED_LO<span class="sy0">,</span>colorGain<span class="br0">)</span><span class="sy0">;</span>
+	set_gain<span class="br0">(</span>REG_INT_GREEN_LO<span class="sy0">,</span>colorGain<span class="br0">)</span><span class="sy0">;</span>
+	set_gain<span class="br0">(</span>REG_INT_BLUE_LO<span class="sy0">,</span>colorGain<span class="br0">)</span><span class="sy0">;</span>
+
+
+	<span class="co1">//reset the RGB (and clear) values</span>
+	<span class="kw4">int</span> cc <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+	<span class="kw4">int</span> red<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span>
+	<span class="kw4">int</span> green<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span>
+	<span class="kw4">int</span> blue<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span>
+
+
+	<span class="co1">// Take 4 samples, and add them together.</span>
+	<span class="kw1">for</span> <span class="br0">(</span><span class="kw4">int</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span>4 <span class="sy0">;</span>i <span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span>
+		performMeasurement<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+		cc <span class="sy0">+=</span>get_readout<span class="br0">(</span>REG_DATA_CLEAR_LO<span class="br0">)</span><span class="sy0">;</span>
+		red <span class="sy0">+=</span>get_readout<span class="br0">(</span>REG_DATA_RED_LO<span class="br0">)</span><span class="sy0">;</span>
+		green <span class="sy0">+=</span>get_readout<span class="br0">(</span>REG_DATA_GREEN_LO<span class="br0">)</span><span class="sy0">;</span>
+		blue <span class="sy0">+=</span>get_readout<span class="br0">(</span>REG_DATA_BLUE_LO<span class="br0">)</span><span class="sy0">;</span>
+	<span class="br0">}</span>
+
+	<span class="co1">//now, divide the totals for each by 4 to get their average.</span>
+	cc<span class="sy0">/=</span><span class="nu0">4</span><span class="sy0">;</span>
+	red <span class="sy0">/=</span><span class="nu0">4</span><span class="sy0">;</span>
+	green <span class="sy0">/=</span><span class="nu0">4</span><span class="sy0">;</span>
+	blue <span class="sy0">/=</span><span class="nu0">4</span><span class="sy0">;</span>
+
+	<span class="co1">//take the values mesured from above, and multiply them with the factors to</span>
+	<span class="co1">//find out what value should be sent to the external RGB LED to reproduce this color</span>
+	<span class="kw4">float</span> redValue <span class="sy0">=</span> <span class="br0">(</span><span class="kw4">float</span><span class="br0">)</span>red<span class="sy0">*</span>redFactor<span class="sy0">;</span>
+	<span class="kw4">float</span> greenValue <span class="sy0">=</span> <span class="br0">(</span><span class="kw4">float</span><span class="br0">)</span>green<span class="sy0">*</span>greenFactor<span class="sy0">;</span>
+	<span class="kw4">float</span> blueValue <span class="sy0">=</span> <span class="br0">(</span><span class="kw4">float</span><span class="br0">)</span>blue<span class="sy0">*</span>blueFactor<span class="sy0">;</span>
+
+
+	<span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"red: "</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>redValue<span class="br0">)</span><span class="sy0">;</span>
+
+	<span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"green: "</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>greenValue<span class="br0">)</span><span class="sy0">;</span>
+
+	<span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"blue: "</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>blueValue<span class="br0">)</span><span class="sy0">;</span>
+
+
+	<span class="co1">//send to LED</span>
+	<span class="kw3">analogWrite</span><span class="br0">(</span>redPin<span class="sy0">,</span> <span class="kw3">map</span><span class="br0">(</span>redValue<span class="sy0">,</span> 0<span class="sy0">,</span> 1024<span class="sy0">,</span> 0<span class="sy0">,</span> 255<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="kw3">analogWrite</span><span class="br0">(</span>greenPin<span class="sy0">,</span> <span class="kw3">map</span><span class="br0">(</span>greenValue<span class="sy0">,</span> 0<span class="sy0">,</span> 1024<span class="sy0">,</span> 0<span class="sy0">,</span> 255<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="kw3">analogWrite</span><span class="br0">(</span>bluePin<span class="sy0">,</span> <span class="kw3">map</span><span class="br0">(</span>blueValue<span class="sy0">,</span> 0<span class="sy0">,</span> 1024<span class="sy0">,</span> 0<span class="sy0">,</span> 255<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>	
+
+
+	<span class="co1">//hold it for one second</span>
+	<span class="kw3">delay</span><span class="br0">(</span>1000<span class="br0">)</span><span class="sy0">;</span> 
+<span class="br0">}</span>
+
+<span class="kw4">int</span> getClearGain<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span>
+	<span class="kw4">int</span> gainFound <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+	<span class="kw4">int</span> upperBox<span class="sy0">=</span><span class="nu0">4096</span><span class="sy0">;</span>
+	<span class="kw4">int</span> lowerBox <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+	<span class="kw4">int</span> half<span class="sy0">;</span>
+
+	<span class="kw1">while</span> <span class="br0">(</span><span class="sy0">!</span>gainFound<span class="br0">)</span> <span class="br0">{</span>
+		half <span class="sy0">=</span> <span class="br0">(</span><span class="br0">(</span>upperBox<span class="sy0">-</span>lowerBox<span class="br0">)</span><span class="sy0">/</span>2<span class="br0">)</span><span class="sy0">+</span>lowerBox<span class="sy0">;</span>
+
+
+		<span class="kw1">if</span> <span class="br0">(</span>half <span class="sy0">==</span> lowerBox<span class="br0">)</span> <span class="br0">{</span> <span class="co1">//no further halfing possbile</span>
+			<span class="kw2">break</span><span class="sy0">;</span> <span class="co1">//no further halfing possbile</span>
+		<span class="br0">}</span> 
+		<span class="kw1">else</span> <span class="br0">{</span>
+			set_gain<span class="br0">(</span>REG_INT_CLEAR_LO<span class="sy0">,</span>half<span class="br0">)</span><span class="sy0">;</span>
+			performMeasurement<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+			<span class="kw4">int</span> halfValue <span class="sy0">=</span> get_readout<span class="br0">(</span>REG_DATA_CLEAR_LO<span class="br0">)</span><span class="sy0">;</span>
+
+			<span class="kw1">if</span> <span class="br0">(</span>halfValue <span class="sy0">&gt;</span> 1000<span class="br0">)</span> <span class="br0">{</span>
+				upperBox<span class="sy0">=</span>half<span class="sy0">;</span>
+			<span class="br0">}</span> 
+			<span class="kw1">else</span> <span class="kw1">if</span> <span class="br0">(</span>halfValue<span class="sy0">&lt;</span>1000<span class="br0">)</span> <span class="br0">{</span>
+				lowerBox <span class="sy0">=</span> half<span class="sy0">;</span>
+			<span class="br0">}</span> 
+			<span class="kw1">else</span> <span class="br0">{</span>
+				<span class="kw2">break</span><span class="sy0">;</span> <span class="co1">//no further halfing possbile</span>
+			<span class="br0">}</span>
+		<span class="br0">}</span>
+	<span class="br0">}</span>
+	<span class="kw1">return</span> half<span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">int</span> getColorGain<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span>
+	<span class="kw4">int</span> gainFound <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+	<span class="kw4">int</span> upperBox<span class="sy0">=</span><span class="nu0">4096</span><span class="sy0">;</span>
+	<span class="kw4">int</span> lowerBox <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+	<span class="kw4">int</span> half<span class="sy0">;</span>
+	<span class="kw1">while</span> <span class="br0">(</span><span class="sy0">!</span>gainFound<span class="br0">)</span> <span class="br0">{</span>
+		half <span class="sy0">=</span> <span class="br0">(</span><span class="br0">(</span>upperBox<span class="sy0">-</span>lowerBox<span class="br0">)</span><span class="sy0">/</span>2<span class="br0">)</span><span class="sy0">+</span>lowerBox<span class="sy0">;</span>
+
+		<span class="kw1">if</span> <span class="br0">(</span>half<span class="sy0">==</span>lowerBox<span class="br0">)</span> <span class="br0">{</span> <span class="co1">//no further halfing possbile</span>
+			<span class="kw2">break</span><span class="sy0">;</span> <span class="co1">// gain found</span>
+		<span class="br0">}</span> 
+		<span class="kw1">else</span> <span class="br0">{</span>
+
+			set_gain<span class="br0">(</span>REG_INT_RED_LO<span class="sy0">,</span>half<span class="br0">)</span><span class="sy0">;</span>
+			set_gain<span class="br0">(</span>REG_INT_GREEN_LO<span class="sy0">,</span>half<span class="br0">)</span><span class="sy0">;</span>
+			set_gain<span class="br0">(</span>REG_INT_BLUE_LO<span class="sy0">,</span>half<span class="br0">)</span><span class="sy0">;</span>
+			performMeasurement<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+			<span class="kw4">int</span> halfValue <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+
+			halfValue<span class="sy0">=</span><span class="kw3">max</span><span class="br0">(</span>halfValue<span class="sy0">,</span>get_readout<span class="br0">(</span>REG_DATA_RED_LO<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+			halfValue<span class="sy0">=</span><span class="kw3">max</span><span class="br0">(</span>halfValue<span class="sy0">,</span>get_readout<span class="br0">(</span>REG_DATA_GREEN_LO<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+			halfValue<span class="sy0">=</span><span class="kw3">max</span><span class="br0">(</span>halfValue<span class="sy0">,</span>get_readout<span class="br0">(</span>REG_DATA_BLUE_LO<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+
+			<span class="kw1">if</span> <span class="br0">(</span>halfValue<span class="sy0">&gt;</span>1000<span class="br0">)</span> <span class="br0">{</span>
+				upperBox<span class="sy0">=</span>half<span class="sy0">;</span>
+
+			<span class="br0">}</span> 
+			<span class="kw1">else</span> <span class="kw1">if</span> <span class="br0">(</span>halfValue<span class="sy0">&lt;</span>1000<span class="br0">)</span> <span class="br0">{</span>
+				lowerBox<span class="sy0">=</span>half<span class="sy0">;</span>
+
+			<span class="br0">}</span> 
+			<span class="kw1">else</span> <span class="br0">{</span>
+				<span class="kw2">break</span><span class="sy0">;</span> <span class="co1">// gain found</span>
+			<span class="br0">}</span>
+		<span class="br0">}</span>
+	<span class="br0">}</span>
+	<span class="kw1">return</span> half<span class="sy0">;</span>
+<span class="br0">}</span>
+
+
+<span class="kw4">void</span> performMeasurement<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span>
+	set_register<span class="br0">(</span>0x00<span class="sy0">,</span>0x01<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// start sensing</span>
+
+	<span class="kw1">while</span><span class="br0">(</span>read_register<span class="br0">(</span>0x00<span class="br0">)</span> <span class="sy0">!=</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+		<span class="co1">// waiting for a result</span>
+	<span class="br0">}</span>
+<span class="br0">}</span>
+
+<span class="kw4">int</span> get_readout<span class="br0">(</span><span class="kw4">int</span> readRegister<span class="br0">)</span> <span class="br0">{</span>
+	<span class="kw1">return</span> read_register<span class="br0">(</span>readRegister<span class="br0">)</span> <span class="sy0">+</span> <span class="br0">(</span>read_register<span class="br0">(</span>readRegister<span class="sy0">+</span>1<span class="br0">)</span><span class="sy0">&lt;&lt;</span>8<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> set_gain<span class="br0">(</span><span class="kw4">int</span> gainRegister<span class="sy0">,</span> <span class="kw4">int</span> gain<span class="br0">)</span> <span class="br0">{</span>
+	<span class="kw1">if</span> <span class="br0">(</span>gain <span class="sy0">&lt;</span>4096<span class="br0">)</span> <span class="br0">{</span>
+		uint8_t hi <span class="sy0">=</span> gain <span class="sy0">&gt;&gt;</span> <span class="nu0">8</span><span class="sy0">;</span>
+		uint8_t lo <span class="sy0">=</span> gain<span class="sy0">;</span>
+
+		set_register<span class="br0">(</span>gainRegister<span class="sy0">,</span> lo<span class="br0">)</span><span class="sy0">;</span>
+		set_register<span class="br0">(</span>gainRegister<span class="sy0">+</span>1<span class="sy0">,</span> hi<span class="br0">)</span><span class="sy0">;</span>
+	<span class="br0">}</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> set_register<span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">char</span> r<span class="sy0">,</span> <span class="kw4">unsigned</span> <span class="kw4">char</span> v<span class="br0">)</span><span class="br0">{</span>
+
+	Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>I2C_ADDRESS<span class="br0">)</span><span class="sy0">;</span>
+	Wire.<span class="me1">send</span><span class="br0">(</span>r<span class="br0">)</span><span class="sy0">;</span>
+	Wire.<span class="me1">send</span><span class="br0">(</span>v<span class="br0">)</span><span class="sy0">;</span>
+	Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">unsigned</span> <span class="kw4">char</span> read_register<span class="br0">(</span><span class="kw4">unsigned</span> <span class="kw4">char</span> r<span class="br0">)</span><span class="br0">{</span>
+
+	<span class="kw4">unsigned</span> <span class="kw4">char</span> v<span class="sy0">;</span>
+	Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>I2C_ADDRESS<span class="br0">)</span><span class="sy0">;</span>
+	Wire.<span class="me1">send</span><span class="br0">(</span>r<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// register to read</span>
+	Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+	Wire.<span class="me1">requestFrom</span><span class="br0">(</span>I2C_ADDRESS<span class="sy0">,</span> 1<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// read a byte</span>
+	<span class="kw1">while</span><span class="br0">(</span><span class="sy0">!</span>Wire.<span class="me1">available</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+		<span class="co1">// waiting</span>
+	<span class="br0">}</span>
+	v <span class="sy0">=</span> Wire.<span class="me1">receive</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="kw1">return</span> v<span class="sy0">;</span>
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<p>If you are still with us and want to know more about getting the most from this guy, cool!</p>
+<p>A few things you should know about the sensor before we dive in too deep: I have never been able to get perfect color sampling from this guy without limiting the colors it would detect to just 6, and accurately reproducing color on an LED is not as simple as one would hope. The color reading from the sensor could be spot on, but the reproduced color on the LED may be way off. Also, the sensor has gain settings for RGB, and white, these will need to be tweaked to get good results.</p>
+<p>As you may know, the ADJD-S371 is an I2C component so you can't just read simple serial or analog values from it. Our arduino code uses the Wire.h library to communicate with it, making it a bit easier, but it is still hard to do, and I'm not going to go into detail of how any why it works here.</p>
+<p>Mostly what you need to know about hooking up an I2C device to your arduino is that I2C is a 2-wire serial connection, SDA (Data) and SCL (clock) - On your arduino (everything but the mega) SDA is on analog input pin 4, and SCL is on analog pin 5. On an arduino mega, SDA is digital 20, and SCL is digital 21.</p>
+<p>The ADJD-S371 has 4 sensors on it to detect Red, Green, Blue, and Clear. It reports back an individual reading from each sensor. The white, or clear, sensor is mainly for sensing brightness, but because the LED we will be using to reproduce the color is only an RGB LED, we are just going to disregard the white value.</p>
+<div class="columnBody">
+<div class="leftColumn">
+The ADJD-S371 is designed to sense reflected light using its onboard LED, but I have found that by turning the onboard LED off, it works even better for sensing projected light (like from your monitor or projector). If you are interested in using the sensor for sensing reflected colors, you want the sensor to be about 1-2mm from the subject so the onboard LED can bounce off the material and back to the sensor. 
+<p>It is not clear in any of the documentation, but I believe from looking at the schematic, and reading forums, that the onboard LED should be powered by 5v, not 3.3v.<strong> If this is wrong, please let me know</strong>, but the LED is too dim to work when powered at 3.3v.
+</p></div>
+<div class="rightColumn">
+<a href="images/2011/01/led-bounce.png"><br/>
+<img alt="" class="noFrame" src="images/2011/01/led-bounce.png"/><br/>
+</a>
+</div>
+</div>
+<h3>Calibration</h3>
+<p>The above code and wiring diagram should work out of the box, but to get more accurate color readings from your sensor, you will need to tweak the gain for each color. If the sensor is too sensitive to red for instance, we will need to turn the gain down.</p>
+<p>On this sensor, you assign each color channel a number of capacitors, the more the capacitors assigned to a color, the less sensitive it is. You can assign 0 - 16 capacitors, the values are assigned in hex so 0x00 through 0x0f. If you didn't know, 0x is placed in front of a number to note it is a hexadecimal number.</p>
+<p>All the sensors will be a bit different from each other, but starting with 0x02 for all 4 colors and adjusting as needed should work well. If the sensor is reading too much red, raise the red gain. Too little blue? Lower the blue value, or raise all of the others.</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="co1">//Configure gain here</span>
+<span class="co1">//Higher numbers = less sencitive</span>
+<span class="co1">// 0x00 through 0x0f</span>
+<span class="kw4">int</span> redGain <span class="sy0">=</span> <span class="nu12">0x02</span><span class="sy0">;</span>
+<span class="kw4">int</span> greenGain <span class="sy0">=</span> <span class="nu12">0x2</span><span class="sy0">;</span>
+<span class="kw4">int</span> blueGain <span class="sy0">=</span> <span class="nu12">0x02</span><span class="sy0">;</span>
+<span class="kw4">int</span> clearGain <span class="sy0">=</span> <span class="nu12">0x02</span><span class="sy0">;</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<h3>Reproducing color on an RGB LED.</h3>
+<p>RGB LEDs are all the rage right now because you create many colors with them, but sadly, it is not always as simple as sending a color values to them and getting it back.</p>
+<p>If you don't know, RGB LEDs are actually just 3 LEDs (red, green, blue) that share one lens, and have one of their 2 pins in common (so 4 pins, one for each color, and one common). This common pin is either the anode (positive), or the cathode (ground) of each LED.  Personally I like common cathode because you connect one pin to ground, and you supply power to the other pins to power them. Mentally it makes more sense to me. If you have an common anode LED you tie the common pin to power, and you bring the other pins down towards ground to power them. Something about digitalWrite(ledPin, LOW) does not seem like I am turning it on. But just because I like them, does not mean you have to. In fact, many LED driver chips work exclusively with common anode LEDs, so know your application before you buy.</p>
+</div>
+<div class="rightColumn">
+<p><a href="images/2011/01/RGBLEDs2.png"><br/>
+<img alt="" class="noFrame" src="images/2011/01/RGBLEDs2.png"/><br/>
+</a></p>
+</div>
+</div>
+<p>If you havnt ordered your RGB LEDs yet, go for common cathode diffused ones. <a href="http://www.sparkfun.com/products/9264">Like these</a>. The diffused lens helps blend the colors. With the clear lens LEDs you can really see each color lit up separately, and it it hard to see the blended color. I often place them in a paper tube to act as a defuser when all I have are the clear lens ones.</p>
+<p>Different color LEDs require different voltage to power them, and an RGB LED is no different. Like I said, it is actually 3 LEDs in one, so the blue and green may max out at at 3.2v, the red may max out at 2.0v, so you can't even power them all the same. You need to check the doc sheet to know for sure.</p>
+<p>To simplify things for myself, I always connect resistors to each of the 3 non common legs so I can power the red, blue and green with 5v.</p>
+<p>Using <a href="http://www.sparkfun.com/products/9264">these LEDs</a>, all 3 colors have a current draw of 20ma. The blue and green are rated at 3.2v, and the red at 2.0v. So going over to the handy <a href="http://led.linear1.org/1led.wiz">LED Calculator</a> We find that a 100ohm resistor on both the green and blue pins, and a 150ohm resistor on the red pin will alow all 3 to operate at 5 volts (typical output on an arduino).</p>
+<p>Using the resistors will allow us to use PWM pins on the arduino more easily because it will allow the full range of the PWM (0-255 or 0v-5v) without burning out one of the colors. If you down't want to use the resistors on the LED, you could change the range that the PWMs output in code. (<strong>NOTE:</strong> This will reduce the range and fidelity of the color reproduction.) For instance on the red channel, instead of outputting the full 0-255 range, you could limit it to 0-102 (102 would be 2v). Personally, the resistors make it easier because setting the PWM to 127 would be 50% power on the red, green, or blue LEDs. Here is an example of how you could skip the resistors and still keep some of the simplicity the resistors add.</p>
+<p><strong>Warning: Not using resistors with your LEDs puts them in harms way. One forgotten decimal point, or mistake here, and you could end up with a fried LED.</strong></p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="co1">//function takes 0-100 to light up LED 0 to 100%</span>
+
+<span class="kw4">int</span> bluePin <span class="sy0">=</span> <span class="nu0">11</span><span class="sy0">;</span>
+<span class="kw4">float</span> blueVolts <span class="sy0">=</span> <span class="nu16">3.2</span><span class="sy0">;</span>
+
+<span class="kw4">void</span> writeBlue<span class="br0">(</span><span class="kw4">int</span> power<span class="br0">)</span><span class="br0">{</span>
+  <span class="kw4">float</span> maxPower <span class="sy0">=</span> <span class="br0">(</span>255<span class="sy0">/</span>5<span class="br0">)</span> <span class="sy0">*</span> blueVolts<span class="sy0">;</span>
+  <span class="kw4">int</span> output <span class="sy0">=</span> <span class="kw3">map</span><span class="br0">(</span>power<span class="sy0">,</span> 0<span class="sy0">,</span> 100<span class="sy0">,</span> 0<span class="sy0">,</span> maxPower<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">analogWrite</span><span class="br0">(</span>bluePin<span class="sy0">,</span> output<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+writeBlue<span class="br0">(</span>75<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//blue LED at 75% power</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<p>So now that we know how to power one, you would think that you can easily just power the red at 100% turn off the blue, and the green to 50% and get orange (trust me, that is correct), but again because the LED has 3 distinct LEDs in it, each one has its own brightness as well, so that messes it up. Oh, and the brightness is probably not linear to power, the blue may fall in the less sensitive area of the eye (about 475nm) and the PWM may be doing this or that... Basically, you can get close-ish... But without a lot of work, your color representing will not be perfect.</p>
+<p>One thing that may help. Lower the power sent to the LEDs so they are dimmer. The blending of the colors seems to work better when it is dimmer. Personally, I am happy if I put it on a red thing, and it glows red, im not looking for <a href="http://en.wikipedia.org/wiki/Burnt_umber">burnt umber</a> vs <a href="http://en.wikipedia.org/wiki/Rust_(color)">rust</a></p>
+<p>So I hope this helped you get going with this sensor even if it is not perfect.</p>
+<p>bildr is <strong>communal know-how</strong>, so please, if you have any changes that would make this article better, please let us know.</p>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/adjd-s371-tutorial">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

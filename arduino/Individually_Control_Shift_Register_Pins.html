@@ -1,0 +1,153 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Arduino: Individually Control Shift Register Pins</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2011/08/shiftRegisters.jpg"/></p>
+<div class="intro">
+<strong>If you want an article on general 74hc595 shift register usage with detailed explanition on how it works/what it's doing, you want this article here: <a href="./74hc595">index.html/74hc595/</a>
+<p>The following code and library are compatible with arduino software 1.0+ ONLY. You can download the newest version of the <a href="http://www.arduino.cc/en/Main/Software">arduino software here.</a></p></strong>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+Earlier this year we did <a href="./74hc595">an article on using the 74hc595 shift register with your arduino</a>. It has been, by far, our most popular article. It seems that a lot of people want to control a lot more LEDs (or other) than the arduino can do without help. So we actually went to the guys over at sparkfun and said... "Hey! Let's make this even easier". And so we came up with the 74hc595 breakout board. 
+<p>So now you find your self asking "Why?" Well... chainability! Using right-angle headers you can chain a ton of these together. AND! With the code we have for you, you get an additional 8 digital outputs per board you have connected. That means if you have 1000 of these chained together, you will be able to say "setPin 7,432 HIGH", and BAM! Just like that pin 7,432 goes HIGH. It will literally be like you have more digital outputs on your arduino, no funny business.</p>
+</div>
+<div class="rightColumn">
+<p><a href="images/2011/08/shift-Register-breakout-hookup1.png"><img alt="" class="alignleft size-medium wp-image-1674" height="284" src="images/2011/08/shift-Register-breakout-hookup1-400x284.png" title="shift-Register-breakout-hookup" width="400"/></a></p>
+</div>
+</div>
+<div class="wideBody">
+<h3>Hooking it up</h3>
+<p>At first this board may look confusing to hookup... But just click on the illustration to get a better view of how it is hooked up. We won't be using Reset, so just connect that to power, and connect /OE to ground (enables the board). For VCC you can connect this to 3.3 or 5V on your arduino, and the outputs will just reflect this. So if you power the board with 3.3v, the outputs on the board will output 3.3v as well. We just need 3 digital pins to control the board, and after that we are done.</p>
+<p>You can chain as many of these as you would like. I used right-angle header pins to make it modular and clean. I picked up some <a href="http://search.digikey.com/scripts/DkSearch/dksus.dll?lang=en&amp;site=US&amp;KeyWords=S4381-ND&amp;x=0&amp;y=0">7 pin right-angle headers from digikey</a> to make it even easier. But you dont have to use header pins for this if you don't want. You can easily just wire them together too. Either way, see the illustration below to see how you do this.</p>
+<p><a href="images/2011/08/shift-register-chain.png"><img alt="" class="noFrame alignleft size-large wp-image-1675" height="185" src="images/2011/08/shift-register-chain-950x185.png" title="shift-register-chain" width="950"/></a></p>
+<h3>Code</h3>
+<p>Because it is so much easier to use a lot of these now, we wanted the code to be the same. So we made an Arduino library that is capable of controlling near 2000 of these chained together and still enable you to call each pin individually.  (this library can be used with the plain 74hc959 chip as well)</p>
+<p>The library by default will only support a chain of 25 of these. But that can easily be changed by changing one number in the file "Shifter.h" . If you find your self with a larger chain, hit us up in the discussion area, and we can help you out.</p>
+<p>To use the library, you just need to create an instance of the Shifter library, then you have a few functions to do everything.</p>
+<p><strong>shifter.clear();</strong> - This sets all of the pins on the register chain to LOW<br/>
+<strong>shifter.setPin(20, HIGH)</strong>  - Turn pin 20 (or whatever) HIGH/LOW<br/>
+<strong>shifter.write()</strong>  - Displays the changes made.</p>
+<p>Best practice is to only call shifter.write only when you need to display the changes. This is because shifter.write() can be slow if you have a ton of these chained together (about 1ms per 10 registers (80 pins))</p>
+<p>Make sure to check out the discussion area. We came up with a few cool sequences to test out/ play around with - including the one in the video</p>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<p>To make this code work, <strong>before you load the code, or even open the Arduino program</strong>, we need to place the "Shifter" folder into your Arduino Library. If you don’t know where that is by default, Look to the right.</p>
+<p>If you click the download button to the right of “Arduino” you can download the whole thing as a zip, so you dont need to copy all the files.</p>
+</div>
+<div class="rightColumn">
+<h3>Default Library Folder Location</h3>
+<p><span style="font-size: 10px; line-height:12px;"><strong>On your Mac:</strong>: In (home directory)/Documents/Arduino/libraries<br/>
+<strong>On your PC:</strong>: My Documents -&gt; Arduino -&gt; libraries<br/>
+<strong>On your Linux box:</strong>: (home directory)/sketchbook/libraries<br/>
+</span></p>
+</div>
+</div>
+<div class="clear">
+<script src="../github/Shift-Register-8-Bit-74HC595.js"></script>
+</div>
+<div class="wideBody">
+<h3>Video</h3>
+<p><iframe frameborder="0" height="534" src="http://player.vimeo.com/video/27660337?byline=0&amp;portrait=0" width="949"></iframe></p>
+</div>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/74hc595-breakout-arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

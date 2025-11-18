@@ -1,0 +1,293 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Do You Have The Time? DS1307 RT Clock + Arduino</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2011/02/RTC_Module.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+Most microcontrollers are time-agnostic, meaning they are unaware of the time around them, but that's ok as most things we make have no need for it. But... every once in awhile you come up with an idea that requires knowing the actual time. Mostly this is used for data-logging, or creating this year's newest clock. (Why do we come up with harder ways to tell time?) But whatever your reason, we have a solution: <a href="http://www.sparkfun.com/products/99">The DS1307 RTC</a> (Real Time Clock).
+<p>For this article we will be discussing and using <a href="http://www.sparkfun.com">Sparkfun's</a> RTC Module because it incorporates everything you need to make it work, including a backup battery good for a minimum of 9 years. It also comes with the time preset so you may not even need to configure it when you get it.</p>
+<h3>Why write this article?</h3>
+<p>If you look around, this chip has been used for years, and there are dozens of tutorials on using it. So why write another? I read a lot of them and they all had slightly different information, and most of them talked about the chip without the crystal or other needed addons. So im writing this specifically about using Sparkfun's RTC module version, and specifically for use on an Arduino.</p>
+<h3>About</h3>
+<p>The DS1307 is actually a very simple I2C chip. It just gives you back 7 bytes of information that is the time. So all we need to do is receive it ... and transcode it to decimal. "Transcode it to decimal?!?" Yeah, don't worry, it sounds scary, but it's not. See the DS1307 encodes all the data in "Binary Coded Decimal" or BCD. BCD is just a way to encode numbers, and works by encoding each digit in 4 digits of binary... like so:<br/>
+157 = 0001 0101 0111<br/>
+1 = 0001<br/>
+5 = 0101<br/>
+7 = 0111</p>
+<p>Normally you would say that 157 = 10011101. But that is 157, BCD encodes each digit separately. 1, 5, 7 not 157. hence 0001, 0101, 0111 not 10011101.</p>
+<p>Ok, now that we know we will be receiving the data as BCD, we just need a way to convert that to decimal. Luckily, <a href="http://tronixstuff.wordpress.com/author/johnboxall/">John Boxall</a> over at <a href="http://tronixstuff.wordpress.com/">TronixStuff</a> (incredibly awesome site) has a pretty simple function to do that for us. Lucky for me too because my method was much more complicated.</p>
+</div>
+<div class="rightColumn">
+<p><a href="images/2011/02/RTC-drawing2.png" rel="attachment wp-att-690"><img class="noFrame" src="images/2011/02/RTC-drawing2.png"/></a></p>
+</div>
+</div>
+<h3>Time Shifting</h3>
+<p>Like all clocks, minus maybe atomic clocks, this clock isn't perfect. Just as the clock on your microwave, the time on this chip will shift. It uses a crystal oscillator to be as precise as possible, but these are susceptible to drift based on temperature changes and magnetic fields, so it's going to shift. How much? Well the spec sheet is a little vague about that. But from what I have read, about one minute per month is considered normal. If this is just too much drift, you do have other options - The <a href="http://www.sparkfun.com/products/10160">DS3234</a> clock's drift is +/- only 1min a year.</p>
+<p>Because it drifts, you may at some point need to re-set the time on it. Because we at bildr don't like to leave you in the cold, we are including an example of that too.</p>
+<h3>Hooking it up</h3>
+<p>A few articles I have read have mentioned not connecting this or that, or the need for pull up resistors on the I2C Lines. But, the Arduino has built-in Pull-Up resistors for the I2C lines initiated by the <a href="http://www.arduino.cc/en/Reference/Wire">Wire library</a> , so unless you have more than one I2C device on the bus, you are fine without them. </p>
+<p>Because the DS1307 is an I2C device (I2C is a 2-wire serial connection), you jusst need to connect the SDA (Data) and SCL (Clock) lines to your Arduino for communication. On your Arduino (everything but the mega) SDA is on analog pin 4, and SCL is on analog pin 5. On an arduino mega, SDA is digital 20, and SCL is digital 21.</p>
+<h3>Code</h3>
+<p>If you intend to use the clock to set alarms and trigger events based on time, then you should take a look at <a href="https://github.com/adafruit/RTClib">Lady Ada's library for this</a>. It's more advanced, and allows you to make alarms, and check how much time is left and so on.</p>
+<p>Our code for this is purposely oversimplified. I wasn't sure how to frame it, but because this chip is petty simple, I wanted to show it to you in the code. For this reason, and because the chip comes with the date set from Sparkfun, we are going to leave out the code for setting it from the first example. <strong>The second example includes code for setting the time.</strong></p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;">
+
+<span class="co2">#include "Wire.h"</span>
+<span class="co2">#define DS1307_ADDRESS 0x68</span>
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  Wire.<span class="me1">begin</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  printDate<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">delay</span><span class="br0">(</span>1000<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">byte</span> bcdToDec<span class="br0">(</span><span class="kw4">byte</span> val<span class="br0">)</span>  <span class="br0">{</span>
+<span class="co1">// Convert binary coded decimal to normal decimal numbers</span>
+  <span class="kw1">return</span> <span class="br0">(</span> <span class="br0">(</span>val<span class="sy0">/</span>16<span class="sy0">*</span>10<span class="br0">)</span> <span class="sy0">+</span> <span class="br0">(</span>val<span class="sy0">%</span>16<span class="br0">)</span> <span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> printDate<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+
+  <span class="co1">// Reset the register pointer</span>
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>DS1307_ADDRESS<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw4">byte</span> zero <span class="sy0">=</span> <span class="nu12">0x00</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>zero<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+  Wire.<span class="me1">requestFrom</span><span class="br0">(</span>DS1307_ADDRESS<span class="sy0">,</span> 7<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw4">int</span> second <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> minute <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> hour <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span> <span class="sy0">&amp;</span> 0b111111<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//24 hour time</span>
+  <span class="kw4">int</span> weekDay <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">//0-6 -&gt; sunday - Saturday</span>
+  <span class="kw4">int</span> monthDay <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> month <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> year <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="co1">//print the date EG   3/1/11 23:59:59</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>month<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"/"</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>monthDay<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"/"</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>year<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">" "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>hour<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">":"</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>minute<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">":"</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span>second<span class="br0">)</span><span class="sy0">;</span>
+
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<p><strong>RUNNING THE FOLLOWING CODE WILL RESET THE TIME</strong><br/>
+You will need to set the correct time in the setDateTime function - I did it this way to be a little cleaner looking. Also because the time is set at setup(), it will set the time to that value every time the Arduino restarts. So after you have set it, either upload the above code, or comment out setDateTime from setup, and re-upload the sketch.</p>
+<p>If you need to change the time a bunch, or just make it easy, you could set it up so you can change it via the serial terminal. That could be cool!</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;">
+<span class="co2">#include "Wire.h"</span>
+<span class="co2">#define DS1307_ADDRESS 0x68</span>
+<span class="kw4">byte</span> zero <span class="sy0">=</span> <span class="nu12">0x00</span><span class="sy0">;</span> <span class="co1">//workaround for issue #527</span>
+
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  Wire.<span class="me1">begin</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span>
+  setDateTime<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">//MUST CONFIGURE IN FUNCTION</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  printDate<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">delay</span><span class="br0">(</span>1000<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> setDateTime<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+
+  <span class="kw4">byte</span> second <span class="sy0">=</span>      <span class="nu0">45</span><span class="sy0">;</span> <span class="co1">//0-59</span>
+  <span class="kw4">byte</span> minute <span class="sy0">=</span>      <span class="nu0">40</span><span class="sy0">;</span> <span class="co1">//0-59</span>
+  <span class="kw4">byte</span> hour <span class="sy0">=</span>        <span class="nu0">0</span><span class="sy0">;</span> <span class="co1">//0-23</span>
+  <span class="kw4">byte</span> weekDay <span class="sy0">=</span>     <span class="nu0">2</span><span class="sy0">;</span> <span class="co1">//1-7</span>
+  <span class="kw4">byte</span> monthDay <span class="sy0">=</span>    <span class="nu0">1</span><span class="sy0">;</span> <span class="co1">//1-31</span>
+  <span class="kw4">byte</span> month <span class="sy0">=</span>       <span class="nu0">3</span><span class="sy0">;</span> <span class="co1">//1-12</span>
+  <span class="kw4">byte</span> year  <span class="sy0">=</span>       <span class="nu0">11</span><span class="sy0">;</span> <span class="co1">//0-99</span>
+
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>DS1307_ADDRESS<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>zero<span class="br0">)</span><span class="sy0">;</span>
+
+  Wire.<span class="me1">write</span><span class="br0">(</span>decToBcd<span class="br0">(</span>second<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>decToBcd<span class="br0">(</span>minute<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>decToBcd<span class="br0">(</span>hour<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>decToBcd<span class="br0">(</span>weekDay<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>decToBcd<span class="br0">(</span>monthDay<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>decToBcd<span class="br0">(</span>month<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>decToBcd<span class="br0">(</span>year<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+
+  Wire.<span class="me1">write</span><span class="br0">(</span>zero<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//start </span>
+
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+<span class="br0">}</span>
+
+<span class="kw4">byte</span> decToBcd<span class="br0">(</span><span class="kw4">byte</span> val<span class="br0">)</span><span class="br0">{</span>
+<span class="co1">// Convert normal decimal numbers to binary coded decimal</span>
+  <span class="kw1">return</span> <span class="br0">(</span> <span class="br0">(</span>val<span class="sy0">/</span>10<span class="sy0">*</span>16<span class="br0">)</span> <span class="sy0">+</span> <span class="br0">(</span>val<span class="sy0">%</span>10<span class="br0">)</span> <span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">byte</span> bcdToDec<span class="br0">(</span><span class="kw4">byte</span> val<span class="br0">)</span>  <span class="br0">{</span>
+<span class="co1">// Convert binary coded decimal to normal decimal numbers</span>
+  <span class="kw1">return</span> <span class="br0">(</span> <span class="br0">(</span>val<span class="sy0">/</span>16<span class="sy0">*</span>10<span class="br0">)</span> <span class="sy0">+</span> <span class="br0">(</span>val<span class="sy0">%</span>16<span class="br0">)</span> <span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> printDate<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+
+  <span class="co1">// Reset the register pointer</span>
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>DS1307_ADDRESS<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>zero<span class="br0">)</span><span class="sy0">;</span>
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+
+  Wire.<span class="me1">requestFrom</span><span class="br0">(</span>DS1307_ADDRESS<span class="sy0">,</span> 7<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw4">int</span> second <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> minute <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> hour <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span> <span class="sy0">&amp;</span> 0b111111<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//24 hour time</span>
+  <span class="kw4">int</span> weekDay <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">//0-6 -&gt; sunday - Saturday</span>
+  <span class="kw4">int</span> monthDay <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> month <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw4">int</span> year <span class="sy0">=</span> bcdToDec<span class="br0">(</span>Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="co1">//print the date EG   3/1/11 23:59:59</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>month<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"/"</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>monthDay<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"/"</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>year<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">" "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>hour<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">":"</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>minute<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">":"</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span>second<span class="br0">)</span><span class="sy0">;</span>
+
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<h3>Extending this</h3>
+<p>This is a really simple tutorial, and yeah, maybe it was because I had less time than normal, but that shouldn't stop you from taking this and making something super cool with it. Even if you just combine it with <a href="./rfid-arduino">last weeks tutorial</a>, and have it report the time that the tag was read. A count down for your rocket launcher could be cool, maybe an alarm clock that pours water on you to wake you up. (Dont do that, that just sounds dangerous) Or you could hook this up to a <a href="http://www.sparkfun.com/products/9799">voice synthesizer</a> and have it say the time to you when you clap your hands.</p>
+<p>My point is always the same: Take this simple thing and do something crazy with it, just please step away from the binary clock!</p>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/ds1307-arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

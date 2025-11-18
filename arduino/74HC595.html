@@ -1,0 +1,316 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Can you move over? The 74HC595 8 bit shift register</h2>
+<div class="postContent">
+<p><img alt="" class="noFrame" src="images/2011/02/74HC595.jpg"/></p>
+<div class="wideBody">
+OK, so say you have this crazy cool idea where you need to control a ton of LEDs (I know, I know... LEDs). You looked at the <a href="./cd74hc4067-arduino">multiplexer article</a>, and that was great, but this idea is so cool, you need individual control of each LED, and turning them on one at a time just won’t do. Well again, we are here to help, and now it's time to introduce you to the Shift Register. Not just any shift register, the super cheap, incredibly awesome 74HC595 8-bit Shift Register!
+<h3>What does a Shift Register do?</h3>
+<p>Basically a shift register will, in the end, let you expand on the digital outputs you have on your mictrocontroller. Each one of these 74HC595s can act like 8 more digital outputs, and you can daisy chain them. So you could hook 8 of them up next to each other and have control of 64 outputs.</p>
+<p>But the way it works is a little confusing to think of at first, and these are helpful enough that it is really worth understanding what the heck is going on under the hood.
+</p></div>
+<div class="columnBody">
+<div class="leftColumn">
+You can imagine a shift register as a row of chairs. In this particular case, with the 74HC595, we have a row of 8 chairs. Each chair is either empty (0), or someone is sitting it (1).
+<p>Now, every 10 seconds or so, someone rings a bell, and everyone has to get up and move one chair to the right. If there was someone in that rightmost chair, well they just go away. In that leftmost chair, you can either tell someone to sit in it, or just leave it empty.</p>
+<p>Now bringing this idea back to the 74HC595: This shift register consists of 8 output pins, which are either high (1) or low (0). When you pull the SRCLK (Serial Clock) pin high (analogy to ringing the bell), every pin moves one to the right. The Last pin drops out, and the new pin’s state is defined by the SER (Serial) pin, and you can set that to either 1 (HIGH) or 0 (LOW).</p>
+<p>How does this let me control LEDs again? Well, say you have 8 LEDs hooked up to the shift registers outputs, and we want to turn on the 1st, 3rd and the 8th LED. So... what we can do is clear out the register so all LEDs are off. Then we put in one high, move it right 4 spots, add one high, move it over 1, then add another high. See the image on the right, it will make more sense.</p>
+<p>The great thing is that the shift register has this pin called RCLK or register clock. You can hold this pin LOW while you get everything setup and nothing on the display pins will change. Then when you are done, and everything is how you want, you pull the RCLK HIGH and the 74HC595 will display the new settings. So even though we are changing values in the register in 8 steps, it looks like it was just one step.
+</p></div>
+<div class="rightColumn">
+<a href="images/2011/02/shiftRegister.png"><img class="noFrame" src="images/2011/02/shiftRegister.png"/></a>
+</div>
+</div>
+<p><iframe frameborder="0" height="534" src="http://player.vimeo.com/video/19628251?byline=0&amp;portrait=0" width="949"></iframe></p>
+<div class="columnBody">
+<div class="leftColumn">
+<h3>Hooking it up</h3>
+<p>We are going to start simple. There are really just 3 connections you need aside from power to make this work. But as soon as power and the LEDs are all connected, it starts looking scary. But it's not, so stick with us. - You can see a <a href="http://datasheet.octopart.com/MM74HC595N-Fairchild-datasheet-12735.pdf">spec sheet for the 74HC595 here</a>.</p>
+<ul>
+<li><strong> Vcc</strong><br/>
+Up to 6V (needs to be the same voltage as your microcontroller) - Usually 3.3 / 5v</li>
+<li><strong> QA to QH</strong><br/>
+Shift Register Outputs.</li>
+<li><strong> SER</strong>:<br/>
+(Serial) Input for the next pin that gets shifted in.</li>
+<li><strong> SRCLK</strong><br/>
+(Serial Clock) When this pin is pulled high, it will shift the register.</li>
+<li><strong> RCLK</strong><br/>
+(Register Clock) Needs to be pulled high to set the output to the new shift register values, This must be pulled high directly after SRCLK has gone LOW again.</li>
+<li><strong> SRCLR</strong><br/>
+(Serial Clear) Will empty the whole Shift Register if pulled LOW, must be pulled High to enable.</li>
+<li><strong> OE</strong><br/>
+(Output Enable) This pin enables the output when tied to GND, &amp; disabled when HIGH.</li>
+</ul>
+<h3>How we make it work</h3>
+<p>Whenever the signal on the SERCLK-pin goes high, all the values get shifted to the right, and a new value gets shifted in (Whatever SER is set to). After you shifted in your new value, to see the changes made, you must also set the RCLK pin HIGH in order to update the output-pins with the new data. We wanted to get your's up and running as quick as possible, so we put together some code for the Arduino, and AVR microcontrollers: see below for code examples.</p>
+<p>The Arduino example enables individual control over the register pins. However the AVR example currently does not and must be fed a binary sequence. If you are interested in helping transcode the Arduino code into AVR (or any other language) so it will support individual pin control pleas let us know.</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;">setRegisterPin<span class="br0">(</span>2<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+setRegisterPin<span class="br0">(</span>3<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+setRegisterPin<span class="br0">(</span>4<span class="sy0">,</span> <span class="kw2">LOW</span><span class="br0">)</span><span class="sy0">;</span>
+setRegisterPin<span class="br0">(</span>5<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+setRegisterPin<span class="br0">(</span>7<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+
+<span class="co1">//Once you have set the desired changes to the </span>
+<span class="co1">//register pins, you will need to call writeRegisters </span>
+<span class="co1">//before it is displayed. Only do this at the end, </span>
+<span class="co1">//and not after each setRegisterPin call because this</span>
+<span class="co1">//function takes some time to write the values. </span>
+<span class="co1">//writeRegisters takes about 1ms per 10 of</span>
+<span class="co1">//the shift registers you have chained (80 pins)</span>
+writeRegisters<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<h3>Cascading Shift Register - AKA chaining them together</h3>
+<p>Like I said above, you could connect 20 of these together if you needed. Shift registers have a pretty clever option built in that allows them to be chained or Cascaded together. You know how the last register just dumps its value when it is shifted over? Well the Qh pin (pin 9) is where the 74HC595 dumps that value. So we just take that and use it as the SER input on a second (or next) shift register, and bam! they are chained together. You will also need to then connect the SERCLK and RCLK pins together, but then you are golden. Check out the schematics to the side and below to see how it is connected.
+</p></div>
+<div class="rightColumn">
+<p><a href="images/2011/02/574px-SN74HC595-pinout.png"><img class="noFrame" src="images/2011/02/574px-SN74HC595-pinout.png"/></a></p>
+<p><a href="images/2011/02/74HC959_right_1.png"><img class="noFrame" src="images/2011/02/74HC959_right_1.png"/></a></p>
+<p><a href="images/2011/02/74HC959_right_2.png"><img class="noFrame" src="images/2011/02/74HC959_right_2.png"/></a>
+</p></div>
+</div>
+<div class="columnBody">
+<div class="leftColumn">
+<p><a href="images/2011/02/74HC595_3.png"><img class="noFrame" src="images/2011/02/74HC595_3.png"/></a></p>
+</div>
+<div class="rightColumn">
+<p><a href="images/2011/02/74HC595_4.png"><img class="noFrame" src="images/2011/02/74HC595_4.png"/></a></p>
+</div>
+</div>
+<h3>Code</h3>
+<h4 id="addedNewCode">Arduino code for Individual control over each pin - Support for 40+ shift registers</h4>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="kw4">int</span> SER_Pin <span class="sy0">=</span> <span class="nu0">8</span><span class="sy0">;</span>   <span class="co1">//pin 14 on the 75HC595</span>
+<span class="kw4">int</span> RCLK_Pin <span class="sy0">=</span> <span class="nu0">9</span><span class="sy0">;</span>  <span class="co1">//pin 12 on the 75HC595</span>
+<span class="kw4">int</span> SRCLK_Pin <span class="sy0">=</span> <span class="nu0">10</span><span class="sy0">;</span> <span class="co1">//pin 11 on the 75HC595</span>
+
+<span class="co1">//How many of the shift registers - change this</span>
+<span class="co2">#define number_of_74hc595s 1 </span>
+
+<span class="co1">//do not touch</span>
+<span class="co2">#define numOfRegisterPins number_of_74hc595s * 8</span>
+
+<span class="kw4">boolean</span> registers<span class="br0">[</span>numOfRegisterPins<span class="br0">]</span><span class="sy0">;</span>
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="kw3">pinMode</span><span class="br0">(</span>SER_Pin<span class="sy0">,</span> <span class="kw2">OUTPUT</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">pinMode</span><span class="br0">(</span>RCLK_Pin<span class="sy0">,</span> <span class="kw2">OUTPUT</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">pinMode</span><span class="br0">(</span>SRCLK_Pin<span class="sy0">,</span> <span class="kw2">OUTPUT</span><span class="br0">)</span><span class="sy0">;</span>
+
+
+  <span class="co1">//reset all register pins</span>
+  clearRegisters<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+  writeRegisters<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>               
+
+
+<span class="co1">//set all register pins to LOW</span>
+<span class="kw4">void</span> clearRegisters<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="kw1">for</span><span class="br0">(</span><span class="kw4">int</span> i <span class="sy0">=</span> numOfRegisterPins <span class="sy0">-</span> <span class="nu0">1</span><span class="sy0">;</span> i <span class="sy0">&gt;=</span>  <span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">--</span><span class="br0">)</span><span class="br0">{</span>
+     registers<span class="br0">[</span>i<span class="br0">]</span> <span class="sy0">=</span> <span class="kw2">LOW</span><span class="sy0">;</span>
+  <span class="br0">}</span>
+<span class="br0">}</span> 
+
+
+<span class="co1">//Set and display registers</span>
+<span class="co1">//Only call AFTER all values are set how you would like (slow otherwise)</span>
+<span class="kw4">void</span> writeRegisters<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+
+  <span class="kw3">digitalWrite</span><span class="br0">(</span>RCLK_Pin<span class="sy0">,</span> <span class="kw2">LOW</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw1">for</span><span class="br0">(</span><span class="kw4">int</span> i <span class="sy0">=</span> numOfRegisterPins <span class="sy0">-</span> <span class="nu0">1</span><span class="sy0">;</span> i <span class="sy0">&gt;=</span>  <span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">--</span><span class="br0">)</span><span class="br0">{</span>
+    <span class="kw3">digitalWrite</span><span class="br0">(</span>SRCLK_Pin<span class="sy0">,</span> <span class="kw2">LOW</span><span class="br0">)</span><span class="sy0">;</span>
+
+    <span class="kw4">int</span> val <span class="sy0">=</span> registers<span class="br0">[</span>i<span class="br0">]</span><span class="sy0">;</span>
+
+    <span class="kw3">digitalWrite</span><span class="br0">(</span>SER_Pin<span class="sy0">,</span> val<span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw3">digitalWrite</span><span class="br0">(</span>SRCLK_Pin<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="br0">}</span>
+  <span class="kw3">digitalWrite</span><span class="br0">(</span>RCLK_Pin<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+
+<span class="br0">}</span>
+
+<span class="co1">//set an individual pin HIGH or LOW</span>
+<span class="kw4">void</span> setRegisterPin<span class="br0">(</span><span class="kw4">int</span> index<span class="sy0">,</span> <span class="kw4">int</span> value<span class="br0">)</span><span class="br0">{</span>
+  registers<span class="br0">[</span>index<span class="br0">]</span> <span class="sy0">=</span> value<span class="sy0">;</span>
+<span class="br0">}</span>
+
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+
+  setRegisterPin<span class="br0">(</span>2<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+  setRegisterPin<span class="br0">(</span>3<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+  setRegisterPin<span class="br0">(</span>4<span class="sy0">,</span> <span class="kw2">LOW</span><span class="br0">)</span><span class="sy0">;</span>
+  setRegisterPin<span class="br0">(</span>5<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+  setRegisterPin<span class="br0">(</span>7<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+
+
+  writeRegisters<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>  <span class="co1">//MUST BE CALLED TO DISPLAY CHANGES</span>
+  <span class="co1">//Only call once after the values are set how you need.</span>
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<p>This code example just turns on the LEDs in a particular pattern and keeps it here. (This code will only support up to 4 shift registers. Because of it taking in a binary number, it is limited to 32 characters.)</p>
+<p>Here is code for the AVR</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="c codesnip" style="font-family:monospace;"><span class="co2">#include &lt;avr/io.h&gt;</span>
+<span class="co2">#include &lt;util/delay.h&gt;</span>
+
+
+<span class="co2">#define number_of_74hc595s 1 //How many of the shift registers are there daisey chained?</span>
+
+
+<span class="kw4">int</span> main<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+	DDRB <span class="sy0">=</span> <span class="nu12">0xFF</span><span class="sy0">;</span>
+	PORTB <span class="sy0">=</span> <span class="nu12">0x00</span><span class="sy0">;</span>
+	<span class="kw4">char</span> counter <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+
+	<span class="kw1">while</span><span class="br0">(</span>1<span class="br0">)</span><span class="br0">{</span>
+		counter<span class="sy0">++;</span> 				<span class="co1">// Counter used for displaying a number in binary via the shift register</span>
+		shift<span class="br0">(</span>PB1<span class="sy0">,</span> PB2<span class="sy0">,</span> PB3<span class="sy0">,</span> counter<span class="br0">)</span><span class="sy0">;</span>		<span class="co1">// PB1 = SERCLK  PB2 = RCLK  PB3 = SER</span>
+		_delay_ms<span class="br0">(</span>500<span class="br0">)</span><span class="sy0">;</span>				
+		shift<span class="br0">(</span>PB1<span class="sy0">,</span> PB2<span class="sy0">,</span> PB3<span class="sy0">,</span> 0x00<span class="br0">)</span><span class="sy0">;</span>		<span class="co1">// Set all pins to off</span>
+		_delay_ms<span class="br0">(</span>500<span class="br0">)</span><span class="sy0">;</span>
+	<span class="br0">}</span>
+	<span class="kw1">return</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+
+<span class="kw4">void</span> shift<span class="br0">(</span><span class="kw4">int</span> SRCLK_Pin<span class="sy0">,</span> <span class="kw4">int</span> RCLK_Pin<span class="sy0">,</span> <span class="kw4">int</span> SER_Pin<span class="sy0">,</span> <span class="kw4">unsigned</span> <span class="kw4">long</span> data<span class="br0">)</span><span class="br0">{</span>
+	PORTB <span class="sy0">&amp;=</span> ~<span class="br0">(</span>1 <span class="sy0">&lt;&lt;</span> RCLK_Pin<span class="br0">)</span><span class="sy0">;</span> 				<span class="co1">// Set the register-clock pin low</span>
+
+	<span class="kw1">for</span> <span class="br0">(</span><span class="kw4">int</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> <span class="br0">(</span>8 <span class="sy0">*</span> number_of_74hc595s<span class="br0">)</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span><span class="br0">{</span>	<span class="co1">// Now we are entering the loop to shift out 8+ bits</span>
+
+		PORTB <span class="sy0">&amp;=</span> ~<span class="br0">(</span>1 <span class="sy0">&lt;&lt;</span> SRCLK_Pin<span class="br0">)</span><span class="sy0">;</span> 			<span class="co1">// Set the serial-clock pin low</span>
+
+		PORTB <span class="sy0">|=</span> <span class="br0">(</span><span class="br0">(</span><span class="br0">(</span>data<span class="sy0">&amp;</span><span class="br0">(</span>0x01<span class="sy0">&lt;&lt;</span>i<span class="br0">)</span><span class="br0">)</span><span class="sy0">&gt;&gt;</span>i<span class="br0">)</span> <span class="sy0">&lt;&lt;</span> SER_Pin <span class="br0">)</span><span class="sy0">;</span> 	<span class="co1">// Go through each bit of data and output it</span>
+
+		PORTB <span class="sy0">|=</span> <span class="br0">(</span>1 <span class="sy0">&lt;&lt;</span> SRCLK_Pin<span class="br0">)</span><span class="sy0">;</span> 			<span class="co1">// Set the serial-clock pin high</span>
+
+		PORTB <span class="sy0">&amp;=</span> ~<span class="br0">(</span><span class="br0">(</span><span class="br0">(</span>data<span class="sy0">&amp;</span><span class="br0">(</span>0x01<span class="sy0">&lt;&lt;</span>i<span class="br0">)</span><span class="br0">)</span><span class="sy0">&gt;&gt;</span>i<span class="br0">)</span> <span class="sy0">&lt;&lt;</span> SER_Pin <span class="br0">)</span><span class="sy0">;</span>	<span class="co1">// Set the datapin low again	</span>
+	<span class="br0">}</span>
+
+	PORTB <span class="sy0">|=</span> <span class="br0">(</span>1 <span class="sy0">&lt;&lt;</span> RCLK_Pin<span class="br0">)</span><span class="sy0">;</span>				<span class="co1">// Set the register-clock pin high to update the output of the shift-register</span>
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<h3>Conclusion</h3>
+<p>If you need an easy way to extend your output-pins, shift registers are definitely a good choice. They are cheap, fast and if you take the time to play with them, they are pretty simple too.</p>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/74hc595">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

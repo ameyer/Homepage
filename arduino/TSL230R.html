@@ -1,0 +1,189 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>High Sensitivity Light Sensor TSL230R + Arduino</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2011/08/TSL230R.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+<p>A while back we <a href="./temt6000_arduino">covered</a> the TEMT6000, a great little analog sensor for getting ambient light readings when you need something a bit more sensitive than a simple Photoresistor. Well in the spirit of documenting everything we can get our hands on, this week we will be taking the sensitivity to the next level with the <a href="http://www.sparkfun.com/products/8940">TSL230R Light Intensity Sensor</a>. </p>
+<p>I actually bought this a long time ago simply because it looked awesome. I mean really... How often do you see a clear chip? That was enough, I had to have it. Well, aside from looking downright awesome, it is also an incredibly sensitive digital light sensor. This awesome guy is sensitive enough to be used for photography light metering, or be able to tell when someone walks by a lamp on the other side of the room. Also, to top it all off, it actually has 3 sensitivity settings, so if you are in a low-light situation, it has you covered!</p>
+</div>
+<div class="rightColumn">
+<p><a href="images/2011/08/TSL230R-hookup.png"><img alt="" class="alignleft size-medium wp-image-1648" height="228" src="images/2011/08/TSL230R-hookup-400x228.png" title="TSL230R-hookup" width="400"/></a></p>
+</div>
+</div>
+<div class="wideBody">
+<h3>Hooking it up</h3>
+<p>So the TSL230R is actually pretty simple, it really only has power, and signal out. But it has a bunch of extra pins so you can change sensitivity and output type if you want. We don't care about changing the output format, but I did want to keep the "sensitivity select" open for you incase you need it.</p>
+<p>So just connect it up to your Arduino as shown in the image. Make sure to take note of either the larger pin in the bottom left (pin 4) or the circle on the top left (pin 1) to make sure you have it facing the right way.</p>
+<h3>Code</h3>
+<p><strong>Before we get to far!</strong> If you are looking for a photo-ready reading from this sensor, in ISO, ASA, Lux or other, you are in the wrong place. You want this article here: <a href="http://roamingdrone.wordpress.com/2008/11/13/arduino-and-the-taos-tsl230r-light-sensor-getting-started/">Arduino and the Taos TSL230R Light Sensor: Getting Started</a>. </p>
+<p>If you want to be able to check for changes in light, and have some simpler code to tame this beast, keep reading. </p>
+<p>So what the TSL230R does, is it sends out a digital Square Wave (simple up and down) signal that gets longer with less light, and shorter with more light. So we need to look at how long the wave is so we can figure out the brightness. We will actually be taking a few samples and averaging them so the signal will be more accurate and smoother. If you are looking at using a threshold to trigger something, you may want to up the number of samples it takes so it is even smoother and you don't get false positives. (but this will slow down how long it takes to read)</p>
+<p>This code simply checks the output of the TSL230R, and prints to the Arduino's software serial terminal. With higher readings meaning brighter. You can change the sensitivity of the TSL230R as well. In the sketch, under setupTSL230, you can set TSL230_s0, and TSL230_s1 HIGH or LOW to make the sensor more or less sensitive to light. Great for low-light, or ultra-bright situations.</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="co1">// Reports the frequency from the TSL230, higher number means brighter</span>
+<span class="co1">// Part: http://www.sparkfun.com/products/8940</span>
+<span class="co1">// Article:  http://bildr.org/2011/08/tsl230r-arduino/ </span>
+
+
+<span class="kw4">int</span> TSL230_Pin <span class="sy0">=</span> <span class="nu0">4</span><span class="sy0">;</span> <span class="co1">//TSL230 output</span>
+<span class="kw4">int</span> TSL230_s0 <span class="sy0">=</span> <span class="nu0">3</span><span class="sy0">;</span> <span class="co1">//TSL230 sensitivity setting 1</span>
+<span class="kw4">int</span> TSL230_s1 <span class="sy0">=</span> <span class="nu0">2</span><span class="sy0">;</span> <span class="co1">//TSL230 sensitivity setting 2</span>
+
+<span class="kw4">int</span> TSL230_samples <span class="sy0">=</span> <span class="nu0">6</span><span class="sy0">;</span> <span class="co1">//higher = slower but more stable and accurate</span>
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span>
+  setupTSL230<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+
+  <span class="kw4">float</span> lightLevel <span class="sy0">=</span> readTSL230<span class="br0">(</span>TSL230_samples<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span>lightLevel<span class="br0">)</span><span class="sy0">;</span>
+
+
+<span class="br0">}</span>
+
+<span class="kw4">void</span> setupTSL230<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="kw3">pinMode</span><span class="br0">(</span>TSL230_s0<span class="sy0">,</span> <span class="kw2">OUTPUT</span><span class="br0">)</span><span class="sy0">;</span> 
+  <span class="kw3">pinMode</span><span class="br0">(</span>TSL230_s1<span class="sy0">,</span> <span class="kw2">OUTPUT</span><span class="br0">)</span><span class="sy0">;</span> 
+
+  <span class="co1">//configure sensitivity - Can set to</span>
+  <span class="co1">//S1 LOW  | S0 HIGH: low</span>
+  <span class="co1">//S1 HIGH | S0 LOW:  med</span>
+  <span class="co1">//S1 HIGH | S0 HIGH: high</span>
+
+  <span class="kw3">digitalWrite</span><span class="br0">(</span>TSL230_s1<span class="sy0">,</span> <span class="kw2">LOW</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">digitalWrite</span><span class="br0">(</span>TSL230_s0<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+
+
+<span class="kw4">float</span> readTSL230<span class="br0">(</span><span class="kw4">int</span> samples<span class="br0">)</span><span class="br0">{</span>
+<span class="co1">//sample light, return reading in frequency</span>
+<span class="co1">//higher number means brighter</span>
+
+  <span class="kw4">float</span> start <span class="sy0">=</span> <span class="kw3">micros</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>  
+  <span class="kw4">int</span> readings <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+
+  <span class="kw1">while</span><span class="br0">(</span>readings <span class="sy0">&lt;</span> samples<span class="br0">)</span><span class="br0">{</span>
+   <span class="kw3">pulseIn</span><span class="br0">(</span>TSL230_Pin<span class="sy0">,</span> <span class="kw2">HIGH</span><span class="br0">)</span><span class="sy0">;</span>
+   readings <span class="sy0">++;</span>
+  <span class="br0">}</span>
+
+  <span class="kw4">float</span> length <span class="sy0">=</span> <span class="kw3">micros</span><span class="br0">(</span><span class="br0">)</span> <span class="sy0">-</span> start<span class="sy0">;</span>
+  <span class="kw4">float</span> freq <span class="sy0">=</span> <span class="br0">(</span>1000000 <span class="sy0">/</span> <span class="br0">(</span>length <span class="sy0">/</span> samples<span class="br0">)</span><span class="br0">)</span> <span class="sy0">*</span> <span class="nu0">10</span><span class="sy0">;</span>
+
+  <span class="kw1">return</span> freq<span class="sy0">;</span>
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+</div>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/tsl230r-arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

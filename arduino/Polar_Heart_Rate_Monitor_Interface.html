@@ -1,0 +1,210 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Polar Heart Rate Monitor Interface + Arduino</h2>
+<div class="postContent">
+<p><img alt="" class="noFrame" src="images/2011/08/heartRate.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+<div class="intro">
+<strong>The following code and library are compatible with arduino software 1.0+ ONLY. You can download the newest version of the <a href="http://www.arduino.cc/en/Main/Software">arduino software here.</a></strong>
+</div>
+<p>When you start to talk about biometrics in electronics, heart-rate is usually the first thing to come up. And why not? I think it is often the thing we are most aware of changing when we get excited, nervous, are being active, or very calm. There are several ways of sensing heart rate that dont require lots of heavy equipment and electrodes taped to you. A lot of work has been done on wrist worn IR based sensing, but it tends to be error prone, especially with movement. Currently, the best available method at a reasonable price seems to come from the company <a href="http://www.polarusa.com/us-en/">Polar</a>. And, what makes it better is that <a href="http://sparkfun.com">Sparkfun</a> in conjunction with <a href="http://danjuliodesigns.com/">danjuliodesigns</a>, created a microcontroller compatible receiver for the polar monitors. So let's take a look at using the <a href="http://www.sparkfun.com/products/8661">Polar Heart Rate Monitor Interface</a> and getting it running with your arduino.</p>
+<p>The annoying thing about all of this is that you do need to wear a sensor on your body to get this going. I picked up <a href="http://www.amazon.com/Polar-T31-Non-Coded-Transmitter-Belt/dp/B0015RWZQ4">this guy</a> off amazon and had pretty good results most of the time. </p>
+<p>This transmitter band is a reusable electrode that wirelessly transmits to a receiver. A note when you are testing, the band will only transmit when it is on person, or you have semi-wet thumbs pressed into the sensor plates. Also because it is an electrode, it wants a good connection with your skin... meaning sweat. They sell electrode gel you can use with it for a better connection when the skin is dry, but I never tried it. In the humid summer nights I was testing this in, I never really had an issue.</p>
+<h3>Hooking It Up</h3>
+<p>Ok... so this board is capable of a ton of stuff. But we are just looking today at using this with the Arduino, and the simplest way is to get this guy running in I2C mode because it will allow us to get the heart rate from it easily into our Arduino.</p>
+<p>I2C is a 2-wire serial connection, so you just need to connect the SDA (Data) and SCL (Clock) lines to your Arduino for communication. On your Arduino (everything but the mega) SDA is on analog pin 4, and SCL is on analog pin 5. On an Arduino Mega, SDA is digital 20, and SCL is digital 21.</p>
+<p>The board doesn't come setup for I2C by default, so we need to make a few changes. There are two solder-jumpers on the board that need to be changed to make this happen. The first is SJ1 just to the right of the 5V pin. Remove the solder from there using <a href="http://www.sparkfun.com/products/8775">solder wick</a> or a solder sucker so that the two parts are not connected. (like in the illustration). Next look at the row of pads at the top of the board labeled OP0 - OP7. We need to solder OP0 so the two pads are connected (See the illustration).</p>
+<p>Ok, so once you have the board modified and ready for I2C communication, we can actually just power it up with 5v to check if it is able to communicate with the band. With the board on, moisten your thumbs and press them firmly into the back of the band where the electrodes are and hold it less than a food from the monitor board. You should see a green LED on the board start to blink. If it does... Awesome, the band and the board are communicating! If not, try it a bit more, and see if you can get it going.</p>
+</div>
+<div class="rightColumn">
+<p><a href="images/2011/08/heartRate-hookup2.png"><img alt="" class="alignleft size-medium wp-image-1729" height="987" src="images/2011/08/heartRate-hookup2-400x987.png" title="heartRate-hookup2" width="400"/></a></p>
+</div>
+</div>
+<div class="wideBody">
+So, now that we know they communicate with each other, connect the board to the arduino as shown, and load up the code below.
+<p>When it is actually running, you will need to wear the band on your chest to get a heart rate signal.</p>
+<h3>code</h3>
+<p>This code is pretty simple. It will take the info from the sensor band (average of 20 of the samples) and report that back in the Arduino's serial terminal as BPM (beats per minute). If it dosnt have a connection, or the band does not have a good connection to the skin, it will report a BPM of 0.</p>
+<p>You should know better than I, but your BPM reading should be between 55 and 140. If you are just sitting around, and you see it around 200, it probably means it has a bad connection. Make sure it has a good connection with your skin, and restart the receiver board/ Arduino. - A note... I did have an hour reading that was very off, but all the other time, it was very accurate.</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;">
+<span class="co1">// Code to retrieve heartrate information from the Polar Heart Rate Monitor Interface via I2C</span>
+<span class="co1">// Part: http://www.sparkfun.com/products/8661</span>
+<span class="co1">// Article:  http://bildr.org/2011/08/heartrate-arduino/</span>
+
+<span class="co2">#include "Wire.h"</span>
+
+<span class="co2">#define HRMI_I2C_ADDR      127</span>
+<span class="co2">#define HRMI_HR_ALG        1   // 1= average sample, 0 = raw sample</span>
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  setupHeartMonitor<span class="br0">(</span>HRMI_HR_ALG<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+
+  <span class="kw4">int</span> heartRate <span class="sy0">=</span> getHeartRate<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span>heartRate<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw3">delay</span><span class="br0">(</span>1000<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//just here to slow down the checking to once a second</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> setupHeartMonitor<span class="br0">(</span><span class="kw4">int</span> type<span class="br0">)</span><span class="br0">{</span>
+  <span class="co1">//setup the heartrate monitor</span>
+  Wire.<span class="me1">begin</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+  writeRegister<span class="br0">(</span>HRMI_I2C_ADDR<span class="sy0">,</span> 0x53<span class="sy0">,</span> type<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// Configure the HRMI with the requested algorithm mode</span>
+<span class="br0">}</span>
+
+<span class="kw4">int</span> getHeartRate<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="co1">//get and return heart rate</span>
+  <span class="co1">//returns 0 if we couldnt get the heart rate</span>
+  <span class="kw4">byte</span> i2cRspArray<span class="br0">[</span>3<span class="br0">]</span><span class="sy0">;</span> <span class="co1">// I2C response array</span>
+  i2cRspArray<span class="br0">[</span>2<span class="br0">]</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+
+  writeRegister<span class="br0">(</span>HRMI_I2C_ADDR<span class="sy0">,</span>  0x47<span class="sy0">,</span> 0x1<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// Request a set of heart rate values </span>
+
+  <span class="kw1">if</span> <span class="br0">(</span>hrmiGetData<span class="br0">(</span>127<span class="sy0">,</span> 3<span class="sy0">,</span> i2cRspArray<span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">return</span> i2cRspArray<span class="br0">[</span>2<span class="br0">]</span><span class="sy0">;</span>
+  <span class="br0">}</span>
+  <span class="kw1">else</span><span class="br0">{</span>
+    <span class="kw1">return</span> <span class="nu0">0</span><span class="sy0">;</span>
+  <span class="br0">}</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> writeRegister<span class="br0">(</span><span class="kw4">int</span> deviceAddress<span class="sy0">,</span> <span class="kw4">byte</span> address<span class="sy0">,</span> <span class="kw4">byte</span> val<span class="br0">)</span> <span class="br0">{</span>
+  <span class="co1">//I2C command to send data to a specific address on the device</span>
+  Wire.<span class="me1">beginTransmission</span><span class="br0">(</span>deviceAddress<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// start transmission to device </span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>address<span class="br0">)</span><span class="sy0">;</span>       <span class="co1">// send register address</span>
+  Wire.<span class="me1">write</span><span class="br0">(</span>val<span class="br0">)</span><span class="sy0">;</span>         <span class="co1">// send value to write</span>
+  Wire.<span class="me1">endTransmission</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>     <span class="co1">// end transmission</span>
+<span class="br0">}</span>
+
+<span class="kw4">boolean</span> hrmiGetData<span class="br0">(</span><span class="kw4">byte</span> addr<span class="sy0">,</span> <span class="kw4">byte</span> numBytes<span class="sy0">,</span> <span class="kw4">byte</span><span class="sy0">*</span> dataArray<span class="br0">)</span><span class="br0">{</span>
+  <span class="co1">//Get data from heart rate monitor and fill dataArray byte with responce</span>
+  <span class="co1">//Returns true if it was able to get it, false if not</span>
+  Wire.<span class="me1">requestFrom</span><span class="br0">(</span>addr<span class="sy0">,</span> numBytes<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw1">if</span> <span class="br0">(</span>Wire.<span class="me1">available</span><span class="br0">(</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+
+    <span class="kw1">for</span> <span class="br0">(</span><span class="kw4">int</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span>numBytes<span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span><span class="br0">{</span>
+      dataArray<span class="br0">[</span>i<span class="br0">]</span> <span class="sy0">=</span> Wire.<span class="me1">read</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+
+    <span class="kw1">return</span> <span class="kw2">true</span><span class="sy0">;</span>
+  <span class="br0">}</span>
+  <span class="kw1">else</span><span class="br0">{</span>
+    <span class="kw1">return</span> <span class="kw2">false</span><span class="sy0">;</span>
+  <span class="br0">}</span>
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+<h3>But it's not working!</h3>
+<p>If it is not working, 99% of the time, it is simply a sensor-band placement issue. Make sure you have a blinking light on the board. If you don't have that light, the band is not communicating with the board. It wont communicate unless it thinks it is on your body, so your skin could be too dry or the placement is off.</p>
+<p>If you see the communication light, but nothing in the arduino, make sure you soldered/ unsoldered the solder-jumpers as described above.
+</p></div>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/heartrate-arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

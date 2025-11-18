@@ -1,0 +1,144 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Finding Location With The EM-406A GPS + Arduino</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2011/05/gps.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+<p>GPS, Global Positioning System, is a system for determining location using satellites and some really complex math and <a href="http://metaresearch.org/cosmology/gps-relativity.asp">general relativity</a>. But regardless of how it works, it is really cool, and pretty inexpensive considering what it is doing. For this article I'm going to get you up and running with the EM-406A GPS (available at <a href="http://www.sparkfun.com/products/465">SparkFun</a> ) and your Arduino, code and all.</p>
+<p>The EM-406A GPS is a pretty simple device, you just power it on, and it works, you just need a way to read the serial output into your Arduino. There are two simple ways of doing this. You can use the <a href="http://www.sparkfun.com/products/10102">GPS Arduino shield from SparkFun</a>, or <a href="http://www.sparkfun.com/">SparkFun</a> also sells a <a href="http://www.sparkfun.com/products/10402">breakout board</a> if you are like me and don't really like shields.</p>
+<p>A couple things you may not know - GPS can be slow to get a lock on the 4+ satellites needed to get your location, and it actually doesn't work well inside. I know, your phone probably has GPS on it, and it works well inside and locates you pretty quickly, but that's actually <a href="http://en.wikipedia.org/wiki/Assisted_GPS">assisted GPS</a> and uses cell reception / wifi signals to help quickly hone in on your location. We don't have that with the EM-406A, so just note, you may need to wait a minute before it gets a lock, and it may not get a lock at all under certain circumstances.</p>
+<h3>Hooking It Up</h3>
+<p>Using the breakout board or the Arduino shield makes connecting the EM-406A pretty easy, only needing 2 serial connections to operate. Note that when using the breakout board, we are using digital pin 2,3 for the serial connection, and not pins 0/1 who are the normal serial ports. This is because we are using a <a href="http://www.arduino.cc/en/Tutorial/SoftwareSerial">software serial</a> connection so that we can still output to the Arduino software serial monitor and read the output. It also has the added benefit of being able to upload a new sketch without disconnecting the GPS first. </p>
+<p>If you are using the Arduino Shield, you just need to make sure that the D-Line/UART switch is switched to "D Line" and not "UART". UART is the arduino's built-in hardware serial connection - But we need this to output the findings. <strong>Also... make sure the shield is turned on</strong>.</p>
+<p>Just note that the GPS requires 5V so it wont work with a 3.3v Arduino like the <a href="http://www.sparkfun.com/products/9266">lilypad</a> or <a href="http://www.sparkfun.com/products/9221">3v Pro</a>.</p>
+<h3>Code</h3>
+<p>For this tutorial I am including 2 sketches. One of them is actually Sparkfun's example and just outputs everything to the serial monitor - And I mean everything! Time, location, speed etc. Im including it here because it is helpful to be able to see everything you can get from this- Just take note of their license on the code.
+</p></div>
+<div class="rightColumn">
+<p><a href="images/2011/04/EM-406A-Arduino.png"><img alt="" class="alignright size-medium wp-image-1192" height="253" src="images/2011/04/EM-406A-Arduino-400x253.png" title="EM-406A-Arduino" width="400"/></a></p>
+<p class="caption">SparkFun breakout board</p>
+<p><a href="images/2011/04/EM-406A-Arduino-Shield1.png"><img alt="" class="alignright size-medium wp-image-1197" height="481" src="images/2011/04/EM-406A-Arduino-Shield1-400x481.png" title="EM-406A-Arduino-Shield" width="400"/></a></p>
+<p class="caption">SparkFun GPS Shield</p>
+</div>
+</div>
+<div class="wideBody">
+<p>The other sketch does something I have seen a lot of people asking about. It tells you your distance from a specific location - in this case, I have it set to the north pole, but you can easily change it to any spot you need. So in the serial monitor it will just tell you how far you are from the north pole, in miles.</p>
+<p>To help you out, I wrote a function to do this that will return the value in miles, nautical miles, or kilometers. You can use this to create <a href="http://arduiniana.org/projects/the-reverse-geo-cache-puzzle/">reverse geo-caching gifts</a> or have it trigger something every X miles.
+</p></div>
+<div class="columnBody">
+<div class="leftColumn">
+<p>To make this code work, <strong>before you load the code, or even open the Arduino program</strong>, we need to place both the “NewSoftSerial” AND “TinyGPS” folders into your Arduino Library. If you don’t know where that is by default, Look to the right.</p>
+<p>If you click the download button to the right of “Arduino” you can download the whole thing as a zip, so you dont need to copy all the files.</p>
+</div>
+<div class="rightColumn">
+<h3>Default Library Folder Location</h3>
+<p><span style="font-size: 10px; line-height:12px;"><strong>On your Mac:</strong>: In (home directory)/Documents/Arduino/libraries<br/>
+<strong>On your PC:</strong>: My Documents -&gt; Arduino -&gt; libraries<br/>
+<strong>On your Linux box:</strong>: (home directory)/sketchbook/libraries<br/>
+</span></p>
+</div>
+</div>
+<div class="clear">
+<script src="../github/GPS-EM-406A.js"></script>
+</div>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/em406a-gps-arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

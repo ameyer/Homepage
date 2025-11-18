@@ -1,0 +1,168 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Sensing Capacitive Touch - MPR121 + Arduino</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2011/05/mpr121.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+<p>Every now and then you get sick of the typical push buttons and you want something cooler. And what is cooler than touch sensitive things? Remember that old lamp in your Grandma's that changed brightness just by touching the base? Yeah, that's right... We are talking THAT cool! The MPR121 capitative touch sensor gives you 12 of such inputs that we can use with our Arduino, and you can get it in <a href="http://www.sparkfun.com/search/results?term=MPR121&amp;what=products">several forms from SparkFun</a> - Im using the <a href="http://www.sparkfun.com/products/9695">basic breakout board</a>.</p>
+<p>How? Well... Capacitive sensing is pretty simple in concept. Every object has capacitance, (in laymen's terms capacitance is just an objects ability to hold a charge), and when you come in contact with something you change its capacitance. Well the  MPR121 just looks for these changes, and tells us when it happens.</p>
+<h3>Hooking It Up</h3>
+<p>Hooking it up to your Arduino is pretty simple, the  MPR121 is an I2C device. I2C is a 2-wire serial connection, so you just need to connect the SDA (Data) and SCL (Clock) lines to your Arduino for communication. On your Arduino (everything but the mega) SDA is on analog pin 4, and SCL is on analog pin 5. On an Arduino Mega, SDA is digital 20, and SCL is digital 21.</p>
+<p>When the MPR121 senses a change, it pulls an interrupt pin LOW. Now if we were ninja's we would use this oppertunity to create an interrupt on our Arduino and deal with changed immediately. However, to simplify things for us non-ninjas, we are just going to check that pin to see if it is LOW during our loop. To do this, this sensor also needs access to another digital pin, and in this case we are using digital 2.</p>
+<h4>Electrodes</h4>
+<p>This is a touch sensor, so we need something to touch right? We call these electrodes. Typically, electrodes can just be some piece of metal, or a wire, or my favorite, <a href="http://www.amazon.com/JVCC-AF20-Aluminum-Foil-Linered/dp/B000QDEQQU/">metal tape</a> (just make sure you have at least 1/2in of bare wire in contact with the sticky part of the tape for good contact). But some times depending on the length of our wire, or the material the electrode is on, it can make triggering the sensor difficult. For this reason, the MPR121 allows you to configure what is needed to trigger and untrigger an electrode. So if you are getting false or no positives, you may need to change that.</p>
+<h4>Proximity Sensing</h4>
+<p>There is a small change in capacitance even as you approach an electrode, just through the air. So if you set the touch threshold, or release threshold too low you may notice it trigger even a few inches away. If you want it to trigger from a decent distance away, the MPR121 supports aggregating all of the electrodes together to use it as a single large proximity sensor - But you will need to read the <a href="http://www.sparkfun.com/datasheets/Components/MPR121.pdf">doc sheet</a> to figure that one out, sorry.</p>
+</div>
+<div class="rightColumn">
+<a href="images/2011/05/mpr121.png"><img alt="" class="alignright size-medium wp-image-1208" height="839" src="images/2011/05/mpr121-400x839.png" title="mpr121" width="400"/></a>
+</div>
+</div>
+<div class="wideBody">
+<h3>Code</h3>
+<p>You may have noticed that <a href="http://www.sparkfun.com">SparkFun</a> has example code for this sensor already - Actually, this code is slightly based off of theirs. But this setup and code is not limited to sensing one electrode at a time like their's is. Also this is using the Wire Library to simplify the code to only 2 files. And... We can also sense when one of the electrodes is let go as well.</p>
+<p>I know this code looks complicated, but most of it is just configuring the sensor (part based off of sparkFun's code). All it does is output in the serial terminal when one of the electrodes is touched or untouched. You can touch all of them at once if you want, and it will show that, then just let go of one, and only that one will show as let go.</p>
+<p>Feel free to change the setup values in section C to adjust the sensitivity of the electrodes. You will see constants used in the code such as TOU_THRESH, these values are defined in mpr121.h incase you need to change them.</p>
+<div class="clear">
+<script src="../github/MPR121.js"></script>
+</div>
+<p></p>
+<p>If you want to trigger individual functions based on the electrode touched, you could do something like this and just add the call to your function under where it says "//X was touched"</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="kw1">if</span><span class="br0">(</span>touchStates<span class="br0">[</span>i<span class="br0">]</span> <span class="sy0">==</span> <span class="nu0">0</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="co1">//pin i was just touched</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span><span class="st0">"pin "</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">print</span><span class="br0">(</span>i<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span><span class="st0">" was just touched"</span><span class="br0">)</span><span class="sy0">;</span>
+
+
+  <span class="kw1">switch</span> <span class="br0">(</span>i<span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">case</span> <span class="nu0">0</span><span class="sy0">:</span>
+      <span class="co1">//0 was touched</span>
+
+      <span class="kw2">break</span><span class="sy0">;</span>
+    <span class="kw1">case</span> <span class="nu0">1</span><span class="sy0">:</span>
+      <span class="co1">//1 was touched</span>
+
+      <span class="kw2">break</span><span class="sy0">;</span> 
+    <span class="kw1">case</span> <span class="nu0">2</span><span class="sy0">:</span>
+      <span class="co1">//2 was touched</span>
+
+      <span class="kw2">break</span><span class="sy0">;</span> 
+    <span class="kw1">case</span> <span class="nu0">3</span><span class="sy0">:</span>
+      <span class="co1">//3 was touched</span>
+  <span class="br0">}</span>
+
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+</div>
+<p>I hope this was helpful in getting your MPR121 up and running with your Arduino, and if you have any questions, please use the discussion link.</p>
+<h3>Video</h3>
+<p><iframe frameborder="0" height="534" src="http://player.vimeo.com/video/24380969?byline=0&amp;portrait=0" width="949"></iframe></p>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/mpr121_arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

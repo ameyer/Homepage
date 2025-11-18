@@ -1,0 +1,335 @@
+/* START 404 section  */
+.githubEmbed_code404{
+	all: unset;
+	background-size: 20px;
+	border: 1px solid #f05a62;
+	color: #f05a62;	
+	padding: 0px 0px 0px 38px;
+	margin-top: -20px;
+	border-radius: 2px;
+	margin-bottom: 20px;
+	font-size: 12px;
+	height: 30px;
+	line-height: 30px;
+}
+
+.githubEmbed_code404 a{
+	font-weight: normal;
+	color: #3abeb4;
+}
+/* END 404 section  */
+
+.githubEmbed_projectWrapper * {
+	display: inline;
+	border-radius: 0px;
+	font: 12px/15px "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif !important;
+	box-shadow: 0 0 0px rgba(0,0,0,0, 0);
+}
+
+.githubEmbed_projectWrapper p,
+.githubEmbed_projectWrapper h1,
+.githubEmbed_projectWrapper h2,
+.githubEmbed_projectWrapper h3,
+.githubEmbed_projectWrapper h4,
+.githubEmbed_projectWrapper h5,
+.githubEmbed_projectWrapper h6,
+.githubEmbed_projectWrapper ol,
+.githubEmbed_projectWrapper ul,
+.githubEmbed_projectWrapper pre,
+.githubEmbed_projectWrapper div,
+.githubEmbed_projectWrapper hr,
+.githubEmbed_projectWrapper noscript,
+.githubEmbed_projectWrapper table {
+	display: block;
+}
+
+.githubEmbed_projectWrapper {
+	
+	height: 357px;
+	position: relative;	
+	font: 12px "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif !important;
+	box-shadow: 0 0 10px rgba(0,0,0,0.2);
+	border-radius: 5px;
+}
+
+/* START header section  */
+.githubEmbed_projectWrapper .projectHeader{
+	position: relative;
+	text-align: center;
+	height: 33px;
+	background: #333;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	overflow: hidden;
+}
+
+.githubEmbed_projectWrapper .projectTitle{
+	position: absolute;
+	top: 0;
+	left: 15px;
+	color: #000;
+	text-shadow: 0px 1px 1px #fff; 
+	line-height: 35px;
+}
+
+.githubEmbed_projectWrapper .projectTitle a{
+	color: #fff;
+	text-shadow: 0px -1px 1px #000; 
+}
+
+.githubEmbed_projectWrapper .projectHeader .downloadButton{
+	position: absolute;
+	color: white !important;
+	z-index: 5;
+	top: 0;
+	right: 0px;
+	width: 100px;
+	height: 33px;
+	text-indent: -9px;
+	border-left: 1px solid rgba(0,0,0,.3);
+	background: #006ad4 url('images/arrow2.png') no-repeat 76px center;
+	background: url('images/arrow2.png') no-repeat 76px center, linear-gradient(to bottom, #2893ff 0%, #0078f1 100%);
+	background-size: 9px, auto;
+	font: 12px/33px "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+	border-top-right-radius: 5px;
+	border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.githubEmbed_projectWrapper .projectHeader a:hover{
+	color: white !important;
+}
+/* END header section  */
+
+/* start footer section  */
+.githubEmbed_projectWrapper .footer{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	text-align: right;
+	background: #ddd;
+	padding-right: 10px;
+	height: 24px;
+	line-height: 24px;
+	color: #555;
+	border: 1px solid rgba(0, 0, 0, .25);
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+.githubEmbed_projectWrapper .footer a{
+	color: #6B7B95;
+}
+/* END footer section  */
+
+.githubEmbed_projectWrapper .body{
+	position: absolute;
+	top: 33px;
+	left: 0;
+	right: 0;
+	bottom: 24px;
+}
+
+
+/* START sidebar/file section  */
+.githubEmbed_projectWrapper .sideBar{
+	position: absolute;
+	top: 0px;
+	left: 0;
+	bottom: 0;
+	width: 198px;
+	border-right: solid 1px #ccc;
+	margin-right: 10px;
+	background-color: #d5dde6;
+	overflow: hidden;
+	border-left: 1px solid rgba(0, 0, 0, .25);
+}
+
+.githubEmbed_projectWrapper .sideBar .fileList{
+	position: absolute;
+	top: 0px;
+	left: 0;
+	right: 0;
+	padding-top: 5px;
+	padding-bottom: 10px;
+	bottom: 0;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.githubEmbed_projectWrapper .fileList .file{
+	cursor: pointer;
+}
+
+.githubEmbed_projectWrapper .fileList .file:hover{
+	text-decoration: none;
+	background: #c3cad8;
+	cursor: pointer;
+}
+
+.githubEmbed_projectWrapper .fileList .file.selected{
+	background: #7a9ec5;
+	cursor: pointer;
+}
+
+.githubEmbed_projectWrapper .fileList .file, 
+.githubEmbed_projectWrapper .fileList .folder {
+	white-space: nowrap;
+	padding-left: 16px;
+	display: block;
+	list-style: none;
+	height: 20px;
+	line-height: 20px;
+}
+
+.githubEmbed_projectWrapper .fileList .file .name{
+	position: relative;
+	text-decoration: none;
+	color: #333;
+	line-height: 20px;
+	background: url(images/file8.png) no-repeat 0 4px;
+	background-size: 9px 11px;
+	padding-left: 13px;
+}
+
+.githubEmbed_projectWrapper .fileList .folder .name{
+	position: relative;
+	text-decoration: none;
+	color: #333;
+	padding: 2px 0;
+	line-height: 20px;
+	background: url(images/folder8.png) no-repeat 0 6px;
+	background-size: 13.5px 11px;
+	padding-left: 18px;
+}
+
+.githubEmbed_projectWrapper .fileHousing .fileHousing .file,
+.githubEmbed_projectWrapper .fileHousing .fileHousing .folder{
+	padding-left: 30px;
+}
+
+.githubEmbed_projectWrapper .fileHousing .fileHousing .fileHousing .file,
+.githubEmbed_projectWrapper .fileHousing .fileHousing .fileHousing .folder{
+	padding-left: 50px;
+}
+
+.githubEmbed_projectWrapper .fileHousing .fileHousing .fileHousing .fileHousing .file,
+.githubEmbed_projectWrapper .fileHousing .fileHousing .fileHousing .fileHousing .folder{
+	padding-left: 70px;
+}
+
+/* END sidebar/file section  */
+
+
+/* START Code section  */
+.githubEmbed_projectWrapper .projectCode{
+	position: absolute;
+	left: 200px;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
+	border-right: 1px solid rgba(0, 0, 0, .25);
+}
+
+.githubEmbed_projectWrapper .projectCode .code pre.code{
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+.githubEmbed_projectWrapper .projectCode .code pre.code code{
+	white-space: pre;
+}
+
+.githubEmbed_projectWrapper .projectCode p{
+	margin: 0 !important;
+}
+
+.githubEmbed_projectWrapper .projectCode .fileHead{
+	font-size: 14px;
+	position: relative;
+	text-align: right;
+	margin: 0;
+	padding: 5px 20px;
+	height: 20px;
+	line-height: 20px;
+	border-bottom: 1px solid rgba(0, 0, 0, .1);
+	color: #222;
+}
+
+.githubEmbed_projectWrapper .projectCode .fileCodeWrapper{
+	background: #fff;
+	position: relative;
+	max-height: 300px;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	min-height: 270px;
+}
+
+.githubEmbed_projectWrapper .projectCode .fileCodeWrapper .lineNumbers{
+	position: absolute;
+	left: 0;
+	top: 0;
+	min-height: 270px;
+	width: 23px;
+	border-right: solid 1px #ccc;
+	text-align: right;
+	padding-right: 5px;
+	position: absolute;
+	color: #808080;
+	font: 10px/15px "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+	background: #eee repeat;
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	user-select:none;
+}
+
+.githubEmbed_projectWrapper .projectCode .fileCodeWrapper .code{
+	position: absolute;
+	right: 0;
+	left: 30px;
+	padding-left: 10px;
+	font: 12px/14px 'Courier New', Courier, mono !important;
+	background: #fff;
+}
+
+/* END Code section  */
+
+
+
+/* START markdown section  */
+.githubEmbed_projectWrapper .code .markdown{
+	margin-left: -20px;
+	padding-top: 20px;
+	font: normal 1em/1.4em "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+	padding-bottom: 40px;
+}
+
+.githubEmbed_projectWrapper .code .markdown a{
+	color: #39c;
+	text-decoration: none;
+}
+
+.githubEmbed_projectWrapper .code .markdown p{
+	padding-bottom: 10px;
+}
+
+.githubEmbed_projectWrapper .code .markdown h1{
+	font-size: 24px;
+	line-height: 24px;
+	margin: 0;
+	padding: 0;
+	margin-bottom: 10px;
+}
+
+.githubEmbed_projectWrapper .code .markdown li{
+	list-style: disc;
+	list-style-position: inside;
+}
+
+.githubEmbed_projectWrapper .code .markdown h5{
+	font-size: 14px;
+	padding-bottom: 3px;
+}
+/* END markdown section  */

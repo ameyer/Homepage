@@ -1,0 +1,152 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>Sensing A Bend With A Flex Sensor + Arduino</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2012/11/flexSensor.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+<p>We spend so much time talking about sensing things less mechanical, that is is easy to forget the accelerometer isnt the only part in town. The flex sensor is one of those parts often overlooked by the advanced user. But what if you need to check if something bent? Like a finger, or a doll arm. (A lot of toy prototypes seem to have this need).</p>
+<p>Anytime you need to detect a flex, or bend, a flex sensor is probably the part for you. They come in a few different sizes ( <a href="https://www.sparkfun.com/products/10264">small</a>, <a href="https://www.sparkfun.com/products/8606">large</a>).</p>
+<p>The flex sensor is basically a variable resistor that reacts to bends. Unbent it measures about 22KΩ, to 40KΩ when bend 180º. Note that the bend is only detected in one direction and the reading can be a bit shaky, so you will have best results detecting changes of at least 10º.</p>
+<p>Also, make sure you don't bend the sensor at the base as it wont register as a change, and could break the leads. I always tape some thick board to the base of it to make it wont bend there.</p>
+</div>
+<div class="rightColumn">
+<p><a href="images/2012/11/flex-sensor-arduino.png"><img alt="" class="alignleft size-medium wp-image-2243" height="300" src="images/2012/11/flex-sensor-arduino-400x300.png" title="flex-sensor-arduino" width="400"/></a></p>
+</div>
+</div>
+<h3>Hooking it up, and why</h3>
+<p>The flex sensor changes its resistance when flexed so we can measure that change using one of the Arduino's analog pins. But to do that we need a fixed resistor (not changing) that we can use for that comparison (We are using a 22K resistor). This is called a <a href="http://en.wikipedia.org/wiki/Voltage_divider">voltage divider</a> and divides the 5v between the flex sensor and the resistor. </p>
+<p>The analog read on your arduino is basically a voltage meter. at 5V (its max) it would read 1023, and at 0v it read 0. So we can measure how much voltage is on the flex sensor using the analogRead and we have our reading. </p>
+<p>The amount of that 5V that each part gets is proportional to its resistance. So if the the flex sensor and the resistor have the same resistance, the 5V is split evenly (2.5V) to each part. (analog reading of 512)</p>
+<p>Just pretend that the the sensor was reading only 1.1K of resistance, the 22K resistor is going to soak up 20 times as much of that 5V. So the flex sensor would only get .23V. (analog reading of 46)</p>
+<p>And if we roll the flex sensor around a tibe, the flex sensor may be 40K or resistance, so the flex sensor will soak up 1.8 times as much of that 5V as the 22K resistor. So the flex sensor would get 3V. (analog reading of 614)</p>
+<h3>Code</h3>
+<p>The arduino code for this just could not be easier. We are adding some serial prints and delays to it just so you can easily see the readings, but they dont need to be there if you dont need them.</p>
+<p>In my tests I was getting a reading on the arduino between 512, and 614. So the range isnt the best. But using the <a href="http://arduino.cc/en/Reference/map">map() function</a>, you can convert that to a larger range.</p>
+<div class="codesnip-container">
+<div class="codeHead">
+<a class="copy" href="#">Copy Code</a>
+</div>
+<pre class="arduino codesnip" style="font-family:monospace;"><span class="kw4">int</span> flexSensorPin <span class="sy0">=</span> A0<span class="sy0">;</span> <span class="co1">//analog pin 0</span>
+
+<span class="kw4">void</span> setup<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="kw3">Serial</span>.<span class="me1">begin</span><span class="br0">(</span>9600<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+
+<span class="kw4">void</span> loop<span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+  <span class="kw4">int</span> flexSensorReading <span class="sy0">=</span> <span class="kw3">analogRead</span><span class="br0">(</span>flexSensorPin<span class="br0">)</span><span class="sy0">;</span> 
+
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span>flexSensorReading<span class="br0">)</span><span class="sy0">;</span>
+
+
+  <span class="co1">//In my tests I was getting a reading on the arduino between 512, and 614. </span>
+  <span class="co1">//Using map(), you can convert that to a larger range like 0-100.</span>
+  <span class="kw4">int</span> flex0to100 <span class="sy0">=</span> <span class="kw3">map</span><span class="br0">(</span>flexSensorReading<span class="sy0">,</span> 512<span class="sy0">,</span> 614<span class="sy0">,</span> 0<span class="sy0">,</span> 100<span class="br0">)</span><span class="sy0">;</span>
+  <span class="kw3">Serial</span>.<span class="me1">println</span><span class="br0">(</span>flex0to100<span class="br0">)</span><span class="sy0">;</span>
+
+  <span class="kw3">delay</span><span class="br0">(</span>250<span class="br0">)</span><span class="sy0">;</span> <span class="co1">//just here to slow down the output for easier reading</span>
+<span class="br0">}</span></pre>
+<div class="codeFoot">
+				Unless otherwise stated, this code is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a> - Please use, change and share it.
+			</div>
+</div>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/flex-sensor-arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>

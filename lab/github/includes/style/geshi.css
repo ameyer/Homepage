@@ -1,0 +1,88 @@
+.de1, .de2 {
+	font-family: monospace;
+	font-weight: normal;
+	font-style: normal;
+	margin: 0;
+	padding: 0;
+	background: inherit;
+}
+
+{font-family: monospace;}
+.imp {
+	font-weight: bold;
+	color: red;
+}
+
+li, li.li1 {
+	font-weight: normal;
+}
+
+li.li2 {
+	font-weight: bold;
+}
+
+.kw1 {
+	color: #b1b100;
+}
+
+.kw2 {
+	color: #000000;
+	font-weight: bold;
+}
+
+.kw3 {
+	color: #0066CC;
+}
+
+.co1 {
+	color: #808080;
+	font-style: italic;
+}
+
+.co2 {
+	color: #808080;
+	font-style: italic;
+}
+
+.coMULTI {
+	color: #808080;
+	font-style: italic;
+}
+
+.es0 {
+	color: #000099;
+	font-weight: bold;
+}
+
+.br0 {
+	color: #66cc66;
+}
+
+.sy0 {
+	color: #66cc66;
+}
+
+.st0 {
+	color: #ff0000;
+}
+
+.nu0 {
+	color: #cc66cc;
+}
+
+.me1 {
+	color: #006600;
+}
+
+.ln-xtra, li.ln-xtra, div.ln-xtra {
+	background-color: #ffc;
+}
+
+span.xtra {
+	display: block;
+}
+
+
+
+
+

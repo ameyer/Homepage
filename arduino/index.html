@@ -1,0 +1,109 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"> <div>From 2010-2012 I wrote 60+ articles detailing how to connect various parts to an arduino for bildr's blog. 
+	<br/>
+	For archival purposes I have decided to host them on my personal site mostly unmodified.</div>
+<br/>
+<div id="articleIndex"><div class="category"><h4>Orentation, Position, and Location</h4><p><a href="6DOF.html">6DOF</a></p><p><a href="ADXL335.html">ADXL335</a></p><p><a href="ADXL345.html">ADXL345</a></p><p><a href="BMP085.html">BMP085</a></p><p><a href="EM-406A.html">EM-406A</a></p><p><a href="HMC5883L.html">HMC5883L</a></p><p><a href="HMC6352.html">HMC6352</a></p><p><a href="L3G4200D.html">L3G4200D</a></p><p><a href="RPI-1031.html">RPI-1031</a></p></div><div class="category"><h4>Additional outputs</h4><p><a href="74HC595.html">74HC595</a></p><p><a href="CD74HC4067.html">CD74HC4067</a></p><p><a href="Individually_Control_Shift_Register_Pins.html">Individually Control Shift Register Pins</a></p><p><a href="N-Channel_MOSFET.html">N-Channel MOSFET</a></p><p><a href="TIP120.html">TIP120</a></p></div><div class="category"><h4>Light</h4><p><a href="ADJD-S311.html">ADJD-S311</a></p><p><a href="ADJD-S371.html">ADJD-S371</a></p><p><a href="LDR.html">LDR</a></p><p><a href="TEMT6000.html">TEMT6000</a></p><p><a href="TSL230R.html">TSL230R</a></p></div><div class="category"><h4>Stepper, Servo &amp; Traditional Motors</h4><p><a href="Big_Easy.html">Big Easy</a></p><p><a href="TB6612FNG.html">TB6612FNG</a></p><p><a href="TLC5940.html">TLC5940</a></p><p><a href="easydriver.html">easydriver</a></p></div><div class="category"><h4>Other</h4><p><a href="DS1307.html">DS1307</a></p><p><a href="ID-20.html">ID-20</a></p><p><a href="Keypad.html">Keypad</a></p><p><a href="MQ-3.html">MQ-3</a></p><p><a href="Polar_Heart_Rate_Monitor_Interface.html">Polar Heart Rate Monitor Interface</a></p><p><a href="Rotary_Encoder.html">Rotary Encoder</a></p><p><a href="SparkFun_EL_Sequencer.html">SparkFun EL Sequencer</a></p></div><div class="category"><h4>Temperature and Humidity</h4><p><a href="DS18B20.html">DS18B20</a></p><p><a href="HIH-4030.html">HIH-4030</a></p><p><a href="MLX90614.html">MLX90614</a></p><p><a href="SHT15.html">SHT15</a></p><p><a href="TMP102.html">TMP102</a></p><p><a href="Thermistor.html">Thermistor</a></p></div><div class="category"><h4>Displays and Output</h4><p><a href="E-Paper.html">E-Paper</a></p><p><a href="KS0108B.html">KS0108B</a></p><p><a href="Thermal_Printer.html">Thermal Printer</a></p></div><div class="category"><h4>Touch Sensors</h4><p><a href="Flex_Sensor.html">Flex Sensor</a></p><p><a href="Flexiforce.html">Flexiforce</a></p><p><a href="Force_Sensitive_Resistor.html">Force Sensitive Resistor</a></p><p><a href="MPR121.html">MPR121</a></p><p><a href="Nintendo_DS_Touch_Screen.html">Nintendo DS Touch Screen</a></p><p><a href="Softpot.html">Softpot</a></p></div><div class="category"><h4>Communication</h4><p><a href="Ethernet_Client.html">Ethernet Client</a></p><p><a href="Ethernet_Server.html">Ethernet Server</a></p><p><a href="Xbee.html">Xbee</a></p><p><a href="control_over_serial.html">control over serial</a></p></div><div class="category"><h4>Proximity Sensing</h4><p><a href="PIR.html">PIR</a></p><p><a href="Proximity_Sensors.html">Proximity Sensors</a></p><p><a href="QRE1113.html">QRE1113</a></p><p><a href="VCNL4000.html">VCNL4000</a></p><p><a href="Various_Hall_Effect_Sensors.html">Various Hall Effect Sensors</a></p></div></div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

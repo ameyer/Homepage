@@ -1,0 +1,176 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="style/main.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.0/mootools-yui-compressed.js" type="text/javascript"></script>
+<script type="text/javascript">
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-4050921-11', 'auto');
+	ga('send', 'pageview');
+	
+	function nospam(user,domain) { window.location = "mailto:" + user + "@" + domain; }
+		
+		
+	window.addEvent('domready', function(){
+
+		$$('.codeHead .copy').addEvent('click', function(event) {
+			this.highlight();
+			event.stop();
+			
+			var code = this.getParent('.codesnip-container').getElement('.codesnip');
+			
+			if (code.select) {
+				code.select();
+			}else if (document.selection) {
+				var range = document.body.createTextRange();
+				range.moveToElementText(code);
+				range.select();
+			} else if (window.getSelection) {
+				var range = document.createRange();
+				range.selectNode(code);
+				window.getSelection().addRange(range);
+			}
+			
+			
+			try {
+				var successful = document.execCommand('copy');
+				var msg = successful ? 'successful' : 'unsuccessful';
+				console.log('Copying text command was ' + msg);
+			} catch (err) {
+				console.log('Oops, unable to copy');
+			}
+		});
+	
+	});
+	</script>
+<!--
+	
+	Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
+	License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
+	
+	
+	Icon Set:	Broccolidry -- http://dribbble.com/shots/587469-Free-16px-Broccolidryiconsaniconsetitisfullof-icons
+	License:	Aribitrary -- http://licence.visualidiot.com/
+	
+	-->
+<title>Adam meyer | Arduino</title>
+</head>
+<body>
+<div id="headerWrapper">
+<div id="header">
+<h1><a href="http://adam-meyer.com">Adam meyer</a></h1>
+<h2>Design + Code</h2>
+<div id="topNav">
+<a href="../about.html" id="aboutLink">About</a>
+<a href="../resume.pdf">Resume</a>
+<a href="../index.html">Portfolio</a>
+<a href="index.html">Arduino Articles</a>
+<span id="contactLink"><span onclick="javascript:nospam('sternmeyer','gmail.com');">Contact</span>
+<div id="contactLinks">
+<a class="icon-twitter" href="http://twitter.com/sternmeyer" title="twitter"></a>
+<a class="icon-linkedin" href="http://www.linkedin.com/pub/adam-meyer/20/7a/850/" title="linked in"></a>
+<a class="icon-dribbble" href="http://dribbble.com/ameyer" title="dribbble"></a>
+<a class="icon-github" href="https://github.com/ameyer" title="github"></a>
+<a class="icon-instagram" href="http://instagram.com/sternmeyer" title="instagram"></a>
+<a class="icon-envelope2" href="mailto:sternmeyer@gmail.com" title="email"></a>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div id="articleWrapper">
+<div class="content">
+<div class="post"><h2>The Big Easy Stepper Motor Driver + Arduino</h2>
+<div class="postContent">
+<p><img class="noFrame" src="images/2012/11/bigEasyDriver-Arduino.jpg"/></p>
+<div class="columnBody">
+<div class="leftColumn">
+<p>Stepper (or step) motors are really cool. They are perfect for automation or any time you need a motor to turn to a specific point, at a specific speed, in a specific direction. And, unlike typical motors, steppers are able to do all of this, and hold their position when they are not moving - The trade off is that they cant move as fast, and you have to power them at full power all the time, but you get total control in return.</p>
+<p>Steppers have a minimum amount they can move known as a step. You can feel these steps if you slowly turn your stepper by hand. The most common steppers have 200 steps per revolution, so all movement is in 1.8º increments (360º / 200). Controlling them can get tricky at first, so today we are doing an article on using the <a href="http://www.sparkfun.com/products/10735">Big EasyDriver Stepper Motor Driver</a>. The big easyDriver is the big brother of the <a href="http://bildr.org/2011/06/easydriver/">easy driver we wrote about last year</a>. It is able to take a lot more abuse and power, so it isn't as easy to destroy as the easy driver, can power much larger motors, and it also gives you a little more control by letting you change the microstepping setting.</p>
+<h3>Motor Voltage / Current</h3>
+<p>A lot of people ask about what voltage they should use to power their motor. Well, when using a stepper driver, you are powering the driver, not the motor. The driver will take over powering the motor for you.</p>
+<p>It is best to power the driver with the highest voltage you can <b>( up to 35V max for this driver )</b>. This will allow the motor to spin faster than if powered at a lower voltage. Exactly why this is is pretty complex, but if you want to know more about it, you should really read this: <a href="http://www.geckodrive.com/support/step-motor-basics.html">Gecko Drive - Step Motor Basics</a></p>
+<p>On the bigEasy driver is a mini potentiometer to control the current to the motor. This varies between 0ma and 2A (2000ma). You want to set it to whatever your motor is rated to. Too high, and you could burn the motor up, too low, you wont get all the power out of your motor. <b style="color: red">Note: The arrow indicators on the current adjustment potentiometer are backwards. Keep this in mind when adjusting the current limits.</b> If you are running a higher power motor, you will probably want to put a heat sink on the driver as well.</p>
+</div>
+<div class="rightColumn">
+<a href="images/2012/11/big-easy-driver-arduino-2.png"><img alt="" class="alignleft size-medium wp-image-2273" height="656" src="images/2012/11/big-easy-driver-arduino-2-400x656.png" title="big-easy-driver-arduino-2" width="400"/></a>
+</div>
+</div>
+<div class="wideBody">
+<h3>Hooking it up</h3>
+<p>Even though there are some 30 pins on the Big Easy Driver, we only need a few to get this up and running. In fact, a good deal of the pins are actually just duplicates that are spaced out differently.</p>
+<h4 style="color: #3399cc">The barebones setup:</h4>
+<p><b>Power the driver with 8-35v</b> - If using a wall adapter, make sure the adapter has at least enough current for the motor. A higher current/amperage rating is better, and just means it wont burn out. (The Big Easy Driver can supply up to 2 amps)<br/>
+<b>Connect the 3 control wires</b> from the "gnd", "dir", and "step" of the Big Easy Driver to the Arduino as shown.<br/>
+<b>Connect the stepper motor to the driver</b> - For me the red/green were one pair, and the blue/yellow was another. If this does not work for you, see the section below on <a href="#mototPairs">finding your motors coil pairs</a>.</p>
+<h3>Code</h3>
+<p>For the arduino code for the driver, im going to be using <a href="http://www.open.com.au/mikem/arduino/AccelStepper/">AccelStepper Library</a>. This is an amazing library that I use for all my stepper needs now. It is even does acceleration and deceleration, supports multiple drivers at once, and most importantly it is non blocking. Meaning, you can be moving your motor as you are reading from a sensor, or turning on lights etc.</p>
+<p>The library even keeps track of the position of the motor. So if you tell it to go to 10,000 - It knows it is at 9,00 already, so it moves an additional 1000 steps. Then you can tell it to go home, and it will go back 10,000 steps to 0.</p>
+<p><b>I highly recommend you download the full library from the author. The version I have here is barebones with none of the examples. It is just here because I believe if you post code, you should post everything you need to make it work</b>
+</p></div>
+<div class="columnBody">
+<div class="leftColumn">
+<p>To make this code work, <strong>before you load the code, or even open the Arduino program</strong>, we need to place the "AccelStepper" folder into your Arduino Library. If you don’t know where that is by default, Look to the right.<br/>
+If you click the download button to the right of “Arduino” you can download the whole thing as a zip, so you dont need to copy all the files.</p>
+</div>
+<div class="rightColumn">
+<h3>Default Library Folder Location</h3>
+<p><span style="font-size: 10px; line-height:12px;"><strong>On your Mac:</strong>: In (home directory)/Documents/Arduino/libraries<br/>
+<strong>On your PC:</strong>: My Documents -&gt; Arduino -&gt; libraries<br/>
+<strong>On your Linux box:</strong>: (home directory)/sketchbook/libraries<br/>
+</span></p>
+</div>
+</div>
+<div class="clear">
+<script src="../github/AccelStepper.js"></script>
+</div>
+<div class="wideBody">
+<p><h2>Additional Information</h2>
+<p></p>
+<h3 id="mototPairs">Finding Your Motors Coil Pairs</h3>
+<p>This driver only needs 4 wires from your stepper. If you have a 4 wire stepper, awesome! If you have a 6 wire stepper, it will be slightly trickier. But no matter what, we need to find the 2 main coils inside of the motor. <b>And if you get it wrong, the motor will just twitch or not move, but you wont break it.</b></p>
+<h4 style="color: #3399cc">4 wire motor</h4>
+<p>Using an ohmMeter, pick one wire at random, and test it with the others until you find a pair that shows resistance of a few ohms (1 - 200ohms most often). Those 2 are your "pair A". Make sure the other 2 wires have the same resistance on them, (if not, it may be broken) and that is your "pair B". With the two pairs of wires, there isnt a backwards, so just plug wires from "pair A" into the "A" on the driver, and "pair B" into "B".</p>
+<h4 style="color: #3399cc">6 wire motor</h4>
+<p>Checking the documents on the motor is the easiest, but if you dont have it, read on.</p>
+<p>6 wire motors have two coils in them just like 4 wire motors. But 6 wire motors also have extra wires that connects to the middle of each coil (centers). So each coil actually has 3 wires, a center and two ends. We don't use coil center wires, we just need the 4 coil ends (2 from each coil).</p>
+<p>Basically, We need to find ends of the two coils. The ends of the coils will have twice the resistance as the center to an end. So we need two pairs of wire that have the highest resistance in the group.</p>
+<p>The easiest way to find out the right 4 wires is to look at the documentation for the motor, but if you dont have that, you can with some testing, find the right ones.</p>
+<p>To find the correct 2 wires, we need to locate the 3 wires from each coil. Start by just picking one at random, and using an ohmMeter, test the resistance with the others until you find the 2 connected to that wire. (3 of them will show no connection because they are part of the other coil). Now, these 3 are for coil "A". Now, take these 3 wires and test the resistance between any 2 of them until find the 2 that have the highest resistance. These are the two ends of that coil "A". Do the same for the other 3 wires to locate the ends of coil "B".</p>
+<p>With the two pairs of wires, there isnt a backwards. So just plug wires from coil A into the A on the driver, and the two from coil B into b.</p>
+<h4 style="color: #3399cc">8 wire motor</h4>
+<p>There is no way to do this without looking at the documentation.</p>
+<h3>Microstepping</h3>
+<p>Most stepper drivers offer something called microstepping, and the Big Easy Driver is no exception. As I mentioned before, steppers have that minimum movement called a step. Microstepping breaks down that step into smaller micro steps. Microstepping allows for smoother, quieter, more accurate control, at slower speeds.</p>
+<p>When using microstepping, a step motor will require more "step pluses" to move the motor. For instance if you are using 16 microsteps (the default on the Big Easy Driver) per step, a 200 step motor would require 3200 "step pluses" to make a full revolution. Just take note when you wonder why telling it to step 200 steps barely rotates the motor.</p>
+<p>Microstepping will reduce the maximum speed / torque of the motor (about 30% less), so it is a trade of speed vs smooth. Because of this, many high end drivers switch to full stepping (no microstepping) at higher speeds, and technically, you could do that with the big easyDriver, but it's too complex for me to figure out, so I wont be covering that.
+</p></p></div>
+<div class="columnBody">
+<div class="leftColumn">
+<h4>Adjusting the microstepping</h4>
+<p>The Big Easy Driver defaults to 16 step microstepping mode. If you want to reduce that, you can do so by pulling the MS1, MS2, and MS3 pins HIGH (connecting them to 5V) or LOW (connecting them to GND). Check out the chart on the side to see how  make the adjustments.</p>
+</div>
+<div class="rightColumn">
+<a href="images/2012/11/microsteps.png"><img alt="" class="alignleft size-full wp-image-2275" height="167" src="images/2012/11/microsteps.png" title="microsteps" width="400"/></a>
+</div>
+</div>
+</div>
+<div id="attribution">
+<p>Article taken from <a href="http://bildr.org/big-easy-driver-arduino">bildr.org</a> with minor changes - <i>I am the original author of this content</i></p>
+<div id="attributionIcons">
+<div class="ccIcon cc"></div>
+<div class="ccIcon sa"></div>
+<div class="ccIcon attribution"></div>
+<div id="attributionText">
+<a href="https://creativecommons.org/licenses/by-sa/3.0/">Content available under:<br/>Attribution-Share Alike 3.0 Unported</a>
+</div>
+</div>
+</div>
+</div></div></div></body></html>
