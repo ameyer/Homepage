@@ -68,13 +68,16 @@
 	top: 0;
 	left: 15px;
 	color: #000;
-	text-shadow: 0px 1px 1px #fff; 
-	line-height: 35px;
+	text-shadow: 0px 1px 1px #fff;
+	line-height: 33px;
+	height: 33px;
+	display: flex;
+	align-items: center;
 }
 
 .githubEmbed_projectWrapper .projectTitle a{
 	color: #fff;
-	text-shadow: 0px -1px 1px #000; 
+	text-shadow: 0px -1px 1px #000;
 }
 
 .githubEmbed_projectWrapper .projectHeader .downloadButton{
@@ -93,6 +96,9 @@
 	font: 12px/33px "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
 	border-top-right-radius: 5px;
 	border: 1px solid rgba(0, 0, 0, .2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .githubEmbed_projectWrapper .projectHeader a:hover{
